@@ -1,51 +1,121 @@
-/* qstiat6-mobile.js
-   Mobile-only ST-IAT Qualtrics extension:
-   - No keyboard required
-   - No “tap anywhere” input
-   - Only accepts clicks on two fixed-size on-screen buttons
-   - Buttons are strictly equal width/height (prevents bias)
-   - Start/Continue use a single on-screen button (no space key)
-   - Keeps your trialsByBlock parameters unchanged (you set them in task file)
-*/
-
 define(['pipAPI', 'pipScorer', 'underscore'], function (APIConstructor, Scorer, _) {
   function stiatExtension(options) {
     var API = new APIConstructor();
     var scorer = new Scorer();
     var piCurrent = API.getCurrent();
 
+    /* =========================
+       Mobile（觸控按鈕）核心：把「按鍵」變成「畫面按鈕」
+       - 仍然沿用原本的 e / i / space 輸入機制（不改你的參數、不改 scoring）
+       - 但在畫面底部顯示兩個等大按鈕，點擊時「模擬」按下 E / I
+       - 指示頁用「開始」按鈕，點擊時「模擬」Space
+       ========================= */
+
+    function fireKey(key) {
+      try {
+        var evt = new KeyboardEvent('keydown', {
+          key: key,
+          code: key === ' ' ? 'Space' : key.toUpperCase(),
+          bubbles: true,
+          cancelable: true
+        });
+        document.dispatchEvent(evt);
+        window.dispatchEvent(evt);
+      } catch (e) {
+        // 某些舊瀏覽器：退回用 keyCode
+        try {
+          var code = key === ' ' ? 32 : key.toUpperCase().charCodeAt(0);
+          var evt2 = document.createEvent('Event');
+          evt2.initEvent('keydown', true, true);
+          evt2.keyCode = code;
+          evt2.which = code;
+          document.dispatchEvent(evt2);
+          window.dispatchEvent(evt2);
+        } catch (e2) {}
+      }
+    }
+
+    function escHtml(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function makeBtnHtml(btnId, label, keyToFire) {
+      // 等大、明確點擊區域、避免誤觸：只有按鈕本身可觸發
+      var safeLabel = escHtml(label || '');
+      return (
+        '<div style="width:100%; text-align:center;">' +
+        '<button type="button" id="' + btnId + '" ' +
+        'style="' +
+        'width:100%;' +
+        'max-width:420px;' +
+        'height:72px;' +
+        'border:2px solid #000;' +
+        'border-radius:12px;' +
+        'background:#fff;' +
+        'color:#000;' +
+        'font-size:22px;' +
+        'font-weight:700;' +
+        'letter-spacing:1px;' +
+        'touch-action:manipulation;' +
+        '-webkit-tap-highlight-color:transparent;' +
+        '">' +
+        safeLabel +
+        '</button>' +
+        '<script>(function(){' +
+        'var b=document.getElementById("' + btnId + '");' +
+        'if(!b)return;' +
+        'b.addEventListener("click",function(ev){ev.preventDefault();ev.stopPropagation();(' +
+        fireKey.toString() +
+        ')(' + JSON.stringify(keyToFire) + ');});' +
+        'b.addEventListener("touchstart",function(ev){ev.preventDefault();ev.stopPropagation();});' +
+        '})();</script>' +
+        '</div>'
+      );
+    }
+
     var stiatObj = {
       canvas: {
         maxWidth: 725,
         proportions: 0.7,
         background: '#ffffff',
-        borderWidth: 0,
+        borderWidth: 5,
         canvasBackground: '#ffffff',
-        borderColor: '#ffffff'
+        borderColor: 'lightblue'
       },
 
-      // These get overridden by your task file
+      // 預設（若 task 檔有傳入會覆蓋）
       category: {
         name: 'Category',
-        title: { media: { word: 'Category' }, css: { color: '#000', 'font-size': '2em' }, height: 4 },
-        media: [],
+        title: { media: { word: 'Category' }, css: { color: '#000', 'font-size': '2em' }, height: 7 },
+        media: [{ word: 'A' }],
         css: { color: '#000', 'font-size': '2em' }
       },
       attribute1: {
-        name: 'Attribute1',
-        title: { media: { word: 'Attribute1' }, css: { color: '#000', 'font-size': '2em' }, height: 4 },
-        media: [],
+        name: '可信',
+        title: { media: { word: '可信' }, css: { color: '#000', 'font-size': '2em' }, height: 7 },
+        media: [{ word: '好' }],
         css: { color: '#000', 'font-size': '2em' }
       },
       attribute2: {
-        name: 'Attribute2',
-        title: { media: { word: 'Attribute2' }, css: { color: '#000', 'font-size': '2em' }, height: 4 },
-        media: [],
+        name: '不可信',
+        title: { media: { word: '不可信' }, css: { color: '#000', 'font-size': '2em' }, height: 7 },
+        media: [{ word: '差' }],
         css: { color: '#000', 'font-size': '2em' }
       },
 
-      // You set these in your task file; do not change here
-      trialsByBlock: [],
+      trialsByBlock: [
+        { instHTML: '', block: 1, miniBlocks: 1, singleAttTrials: 10, sharedAttTrials: 10, categoryTrials: 0 },
+        { instHTML: '', block: 2, miniBlocks: 2, singleAttTrials: 10, sharedAttTrials: 7, categoryTrials: 7 },
+        { instHTML: '', block: 3, miniBlocks: 2, singleAttTrials: 10, sharedAttTrials: 7, categoryTrials: 7 },
+        { instHTML: '', block: 4, miniBlocks: 2, singleAttTrials: 10, sharedAttTrials: 7, categoryTrials: 7 },
+        { instHTML: '', block: 5, miniBlocks: 2, singleAttTrials: 10, sharedAttTrials: 7, categoryTrials: 7 }
+      ],
+
       blockOrder: 'random',
       switchSideBlock: 4,
 
@@ -53,71 +123,50 @@ define(['pipAPI', 'pipScorer', 'underscore'], function (APIConstructor, Scorer, 
       ITIDuration: 250,
       fontColor: '#000000',
 
-      // Top labels (we will sync them to the dynamic button labels per block)
-      leftKeyText: '左邊',
-      rightKeyText: '右邊',
-      keysCss: { 'font-size': '1.05em', 'font-family': 'arial', color: '#000000', 'font-weight': '600' },
+      // —— 顯示用 ——（mobile 不顯示 Press "E"/"I"）
+      leftKeyText: '',
+      rightKeyText: '',
+      keysCss: { 'font-size': '0.8em', 'font-family': 'arial', color: '#000000' },
 
+      // 分類區「或」字
       orText: '或',
-      orCss: { 'font-size': '1.4em', color: '#000000', 'font-weight': '600' },
+      orCss: { 'font-size': '1.6em', color: '#000000' },
 
+      // —— Mobile 觸控按鈕標籤 ——（可由 task 覆寫）
+      touchLeftLabel: '可信',
+      touchRightLabel: '不可信',
+      touchStartLabel: '開始',
+      touchContinueLabel: '繼續',
+
+      // 底部錯誤提示（如你 task 已在上方指示頁寫清楚，這裡也可留空）
       remindErrorText:
-        '<p align="center" style="font-size:0.95em; font-family:arial; margin:0;">' +
-        '如按錯，畫面會顯示紅色 <b style="color:#ff0000;">X</b>，請改按正確一邊後繼續。' +
+        '<p style="text-align:center; font-size:16px; font-family:arial; margin:0;">' +
+        '如按錯，畫面會顯示紅色「<b>X</b>」，請改按正確的按鈕後繼續。' +
         '</p>',
 
-      finalText: '已經完成任務。<br/><br/>請按「繼續」。',
+      finalText: '已完成。<br/><br/>請按「繼續」。',
 
-      // ===== Mobile buttons (EQUAL SIZE) =====
-      touchButtons: {
-        // fallback labels (usually you override dynamically per block)
-        leftLabel: '可信',
-        rightLabel: '不可信',
-        startLabel: '開始',
-        continueLabel: '繼續',
+      // 這些模板通常會被你 task 的 instHTML 覆蓋；保留中文默認以免漏網
+      instTemplatePractice:
+        '<div style="font-size:20px; line-height:1.7; font-family:arial;">' +
+        '<p style="margin:0 0 12px 0;"><b>第 blockNum／nBlocks 部分</b></p>' +
+        '<p style="margin:0 0 12px 0;">請在保持準確的情況下，盡量快速地將詞語歸類。</p>' +
+        '<p style="margin:0 0 12px 0;">準備好後，請按下方「開始」。</p>' +
+        '</div>',
+      instTemplateCategoryRight:
+        '<div style="font-size:20px; line-height:1.7; font-family:arial;">' +
+        '<p style="margin:0 0 12px 0;"><b>第 blockNum／nBlocks 部分</b></p>' +
+        '<p style="margin:0 0 12px 0;">請在保持準確的情況下，盡量快速地將詞語歸類。</p>' +
+        '<p style="margin:0 0 12px 0;">準備好後，請按下方「開始」。</p>' +
+        '</div>',
+      instTemplateCategoryLeft:
+        '<div style="font-size:20px; line-height:1.7; font-family:arial;">' +
+        '<p style="margin:0 0 12px 0;"><b>第 blockNum／nBlocks 部分</b></p>' +
+        '<p style="margin:0 0 12px 0;">請在保持準確的情況下，盡量快速地將詞語歸類。</p>' +
+        '<p style="margin:0 0 12px 0;">準備好後，請按下方「開始」。</p>' +
+        '</div>',
 
-        // IMPORTANT: same css object is used for BOTH left and right buttons
-        // so they are guaranteed to be identical size.
-        css: {
-          width: '40vw',
-          height: '14vh',
-          minHeight: '90px',
-          maxHeight: '120px',
-          background: '#f5f5f5',
-          border: '2px solid #333',
-          borderRadius: '12px',
-          textAlign: 'center',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '22px',
-          fontWeight: '700',
-          lineHeight: '1.25',
-          color: '#000',
-          boxSizing: 'border-box'
-        },
-
-        startCss: {
-          width: '60vw',
-          height: '10vh',
-          minHeight: '70px',
-          maxHeight: '110px',
-          background: '#f5f5f5',
-          border: '2px solid #333',
-          borderRadius: '12px',
-          textAlign: 'center',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '22px',
-          fontWeight: '700',
-          lineHeight: '1.25',
-          color: '#000',
-          boxSizing: 'border-box'
-        }
-      },
-
-      // Feedback strings (usually you keep empty for research use)
+      // feedback（如你不顯示可留英文或空；不影響 D-score 計算）
       fb_strongAssociationWithAttribute2: '',
       fb_moderateAssociationWithAttribute2: '',
       fb_weakAssociationWithAttribute2: '',
@@ -131,171 +180,166 @@ define(['pipAPI', 'pipScorer', 'underscore'], function (APIConstructor, Scorer, 
       notEnough: ''
     };
 
-    // Merge defaults + your options
     _.extend(piCurrent, _.defaults(options, stiatObj));
 
-    // Qualtrics hook
+    /* ===== Qualtrics hooks ===== */
     API.addSettings('onEnd', window.minnoJS.onEnd);
+
+    API.addSettings('logger', {
+      onRow: function (logName, log, settings, ctx) {
+        if (!ctx.logs) ctx.logs = [];
+        ctx.logs.push(log);
+      },
+      onEnd: function (name, settings, ctx) {
+        return ctx.logs;
+      },
+      serialize: function (name, logs) {
+        var headers = ['block', 'trial', 'cond', 'type', 'cat', 'stim', 'resp', 'err', 'rt', 'd', 'fb', 'bOrd'];
+        var myLogs = [];
+        for (var iLog = 0; iLog < logs.length; iLog++) {
+          if (
+            logs[iLog] &&
+            logs[iLog].hasOwnProperty('trial_id') &&
+            logs[iLog].hasOwnProperty('name') &&
+            logs[iLog].hasOwnProperty('responseHandle') &&
+            logs[iLog].hasOwnProperty('stimuli') &&
+            logs[iLog].hasOwnProperty('media') &&
+            logs[iLog].hasOwnProperty('latency') &&
+            logs[iLog].data &&
+            logs[iLog].data.hasOwnProperty('block') &&
+            logs[iLog].data.hasOwnProperty('condition') &&
+            logs[iLog].data.hasOwnProperty('score')
+          ) {
+            myLogs.push(logs[iLog]);
+          }
+        }
+
+        var content = myLogs.map(function (log) {
+          return [
+            log.data.block,
+            log.trial_id,
+            log.data.condition,
+            log.name,
+            log.stimuli[0],
+            log.media[0],
+            log.responseHandle,
+            log.data.score,
+            log.latency,
+            '',
+            '',
+            ''
+          ];
+        });
+
+        content.push([9, 999, 'end', '', '', '', '', '', '', piCurrent.d, piCurrent.feedback, block2Condition]);
+
+        content.unshift(headers);
+        return toCsv(content);
+
+        function toCsv(matrice) {
+          return matrice.map(buildRow).join('\n');
+        }
+        function buildRow(arr) {
+          return arr.map(normalize).join(',');
+        }
+        function normalize(val) {
+          var quotableRgx = /(\n|,|")/;
+          if (quotableRgx.test(val)) return '"' + String(val).replace(/"/g, '""') + '"';
+          return String(val);
+        }
+      },
+      send: function (name, serialized) {
+        window.minnoJS.logger(serialized);
+      }
+    });
+
+    /* =========================
+       Script starts
+       ========================= */
 
     var attribute1 = piCurrent.attribute1.name;
     var attribute2 = piCurrent.attribute2.name;
     var category = piCurrent.category.name;
 
-    // block-order condition saved into explicit table
     var block2Condition;
 
-    // ====== Layouts ======
+    /* ===== Layouts（重點：把觸控按鈕加入每個 trial layout）===== */
+
+    var touchLeftStim = {
+      location: { left: 18, bottom: 3 },
+      css: { width: '46%' },
+      media: { html: makeBtnHtml('minno-touch-left', piCurrent.touchLeftLabel || attribute1, 'e') }
+    };
+    var touchRightStim = {
+      location: { right: 18, bottom: 3 },
+      css: { width: '46%' },
+      media: { html: makeBtnHtml('minno-touch-right', piCurrent.touchRightLabel || attribute2, 'i') }
+    };
+
+    var touchStartStim = {
+      location: { center: 0, bottom: 3 },
+      css: { width: '70%' },
+      media: { html: makeBtnHtml('minno-touch-start', piCurrent.touchStartLabel || '開始', ' ') }
+    };
+
+    var touchContinueStim = {
+      location: { center: 0, bottom: 3 },
+      css: { width: '70%' },
+      media: { html: makeBtnHtml('minno-touch-continue', piCurrent.touchContinueLabel || '繼續', ' ') }
+    };
+
+    // Trials layout（上方標籤）
     var leftLayout = [
-      { location: { left: 6, top: 1 }, media: { word: piCurrent.leftKeyText }, css: piCurrent.keysCss },
-      { location: { right: 6, top: 1 }, media: { word: piCurrent.rightKeyText }, css: piCurrent.keysCss },
+      { location: { left: 6, top: 1 }, media: { word: '' }, css: piCurrent.keysCss },
+      { location: { right: 6, top: 1 }, media: { word: '' }, css: piCurrent.keysCss },
       { location: { left: 6, top: 4 }, media: piCurrent.attribute1.title.media, css: piCurrent.attribute1.title.css },
       { location: { right: 6, top: 4 }, media: piCurrent.attribute2.title.media, css: piCurrent.attribute2.title.css },
       { location: { left: 6, top: 4 + (piCurrent.attribute1.title.height | 3) }, media: { word: piCurrent.orText }, css: piCurrent.orCss },
       { location: { left: 6, top: 11 + (piCurrent.attribute1.title.height | 3) }, media: piCurrent.category.title.media, css: piCurrent.category.title.css }
     ];
+
     var rightLayout = [
-      { location: { left: 6, top: 1 }, media: { word: piCurrent.leftKeyText }, css: piCurrent.keysCss },
-      { location: { right: 6, top: 1 }, media: { word: piCurrent.rightKeyText }, css: piCurrent.keysCss },
+      { location: { left: 6, top: 1 }, media: { word: '' }, css: piCurrent.keysCss },
+      { location: { right: 6, top: 1 }, media: { word: '' }, css: piCurrent.keysCss },
       { location: { left: 6, top: 4 }, media: piCurrent.attribute1.title.media, css: piCurrent.attribute1.title.css },
       { location: { right: 6, top: 4 }, media: piCurrent.attribute2.title.media, css: piCurrent.attribute2.title.css },
       { location: { right: 6, top: 4 + (piCurrent.attribute2.title.height | 3) }, media: { word: piCurrent.orText }, css: piCurrent.orCss },
       { location: { right: 6, top: 11 + (piCurrent.attribute2.title.height | 3) }, media: piCurrent.category.title.media, css: piCurrent.category.title.css }
     ];
+
     var pracLayout = [
-      { location: { left: 6, top: 1 }, media: { word: piCurrent.leftKeyText }, css: piCurrent.keysCss },
-      { location: { right: 6, top: 1 }, media: { word: piCurrent.rightKeyText }, css: piCurrent.keysCss },
+      { location: { left: 6, top: 1 }, media: { word: '' }, css: piCurrent.keysCss },
+      { location: { right: 6, top: 1 }, media: { word: '' }, css: piCurrent.keysCss },
       { location: { left: 6, top: 4 }, media: piCurrent.attribute1.title.media, css: piCurrent.attribute1.title.css },
       { location: { right: 6, top: 4 }, media: piCurrent.attribute2.title.media, css: piCurrent.attribute2.title.css }
     ];
 
     var reminderStimulus = {
-      location: { bottom: 1 },
+      location: { bottom: 11 },
       css: { color: piCurrent.fontColor, 'font-size': '1em' },
       media: { html: piCurrent.remindErrorText }
     };
 
+    function addTouchToLayout(layoutArr) {
+      // 每個 trial 都加兩個底部按鈕（等大）
+      // 注意：Minno layout 會把 html 直接放進 canvas；按鈕 click 會模擬 keydown
+      return layoutArr.concat([touchLeftStim, touchRightStim]);
+    }
+
     API.addSettings('canvas', piCurrent.canvas);
     API.addSettings('base_url', piCurrent.base_url);
 
-    // ====== Stimulus Sets ======
-    API.addStimulusSets({
-      Default: [{ css: { color: '#000000', 'font-size': '2em' } }],
-      instructions: [{ css: { 'font-size': '1.35em', color: '#000000', lineHeight: 1.3 }, nolog: true, location: { bottom: 1 } }],
-
-      attribute1: [{
-        data: { alias: attribute1, handle: 'targetStim' },
-        inherit: 'Default',
-        css: piCurrent.attribute1.css,
-        media: { inherit: { type: 'exRandom', set: 'attribute1' } }
-      }],
-      attribute2: [{
-        data: { alias: attribute2, handle: 'targetStim' },
-        inherit: 'Default',
-        css: piCurrent.attribute2.css,
-        media: { inherit: { type: 'exRandom', set: 'attribute2' } }
-      }],
-      category: [{
-        data: { alias: category, handle: 'targetStim' },
-        inherit: 'Default',
-        css: piCurrent.category.css,
-        media: { inherit: { type: 'exRandom', set: 'category' } }
-      }],
-
-      error: [{
-        data: { handle: 'error' },
-        location: { top: 70 },
-        css: { color: 'red', 'font-size': '4em' },
-        media: { word: 'X' },
-        nolog: true
-      }],
-
-      // ===== Touch buttons (equal size for left & right) =====
-      touchLeftBtn: [{
-        data: { handle: 'touchLeftBtn' },
-        nolog: true,
-        location: { left: 8, bottom: 8 },
-        css: piCurrent.touchButtons.css,
-        media: {
-          html: function () {
-            var txt = piCurrent.touchLeftDynamicLabel || piCurrent.touchButtons.leftLabel || '左';
-            return (
-              '<div style="width:100%;text-align:center;padding:0 8px;word-break:break-word;">' +
-              '<b>' + txt + '</b>' +
-              '</div>'
-            );
-          }
-        }
-      }],
-      touchRightBtn: [{
-        data: { handle: 'touchRightBtn' },
-        nolog: true,
-        location: { right: 8, bottom: 8 },
-        css: piCurrent.touchButtons.css,
-        media: {
-          html: function () {
-            var txt = piCurrent.touchRightDynamicLabel || piCurrent.touchButtons.rightLabel || '右';
-            return (
-              '<div style="width:100%;text-align:center;padding:0 8px;word-break:break-word;">' +
-              '<b>' + txt + '</b>' +
-              '</div>'
-            );
-          }
-        }
-      }],
-
-      // Start / Continue button (single)
-      touchStartBtn: [{
-        data: { handle: 'touchStartBtn' },
-        nolog: true,
-        location: { center: 0, bottom: 8 },
-        css: piCurrent.touchButtons.startCss || piCurrent.touchButtons.css,
-        media: {
-          html: function () {
-            var txt = piCurrent.touchButtons.startLabel || '開始';
-            return '<div style="width:100%;text-align:center;"><b>' + txt + '</b></div>';
-          }
-        }
-      }],
-      touchContinueBtn: [{
-        data: { handle: 'touchContinueBtn' },
-        nolog: true,
-        location: { center: 0, bottom: 8 },
-        css: piCurrent.touchButtons.startCss || piCurrent.touchButtons.css,
-        media: {
-          html: function () {
-            var txt = piCurrent.touchButtons.continueLabel || '繼續';
-            return '<div style="width:100%;text-align:center;"><b>' + txt + '</b></div>';
-          }
-        }
-      }],
-
-      dummyForLog: [{
-        data: { name: 'dummyForLog', alias: 'dummyForLog' },
-        location: { left: 99 },
-        media: { word: ' ' }
-      }]
-    });
-
-    // ====== Media Sets ======
-    API.addMediaSets({
-      attribute1: piCurrent.attribute1.media,
-      attribute2: piCurrent.attribute2.media,
-      category: piCurrent.category.media
-    });
-
-    // ====== Trial Sets ======
-    // NOTE: No full-screen touch input. Only the button stims produce input.
+    /* ===== Trial: sort（仍用 keypressed：由按鈕模擬鍵盤事件）===== */
     API.addTrialSets('sort', {
       data: { score: 0, parcel: 'first' },
       input: [
-        { handle: 'skip1', on: 'keypressed', key: 27 }, // debug only; harmless on mobile
-        { handle: 'left', on: 'click', stimHandle: 'touchLeftBtn' },
-        { handle: 'right', on: 'click', stimHandle: 'touchRightBtn' }
+        { handle: 'skip1', on: 'keypressed', key: 27 }, // Esc
+        { handle: 'left', on: 'keypressed', key: 'e' },
+        { handle: 'right', on: 'keypressed', key: 'i' }
       ],
       interactions: [
         { conditions: [{ type: 'begin' }], actions: [{ type: 'showStim', handle: 'targetStim' }] },
 
-        // Error
         {
           conditions: [
             { type: 'inputEqualsTrial', property: 'corResp', negate: true },
@@ -307,7 +351,6 @@ define(['pipAPI', 'pipScorer', 'underscore'], function (APIConstructor, Scorer, 
           ]
         },
 
-        // Correct
         {
           conditions: [{ type: 'inputEqualsTrial', property: 'corResp' }],
           actions: [
@@ -320,143 +363,135 @@ define(['pipAPI', 'pipScorer', 'underscore'], function (APIConstructor, Scorer, 
 
         { conditions: [{ type: 'inputEquals', value: 'end' }], actions: [{ type: 'endTrial' }] },
 
-        // Skip block (debug)
         { conditions: [{ type: 'inputEquals', value: 'skip1' }], actions: [{ type: 'setInput', input: { handle: 'skip2', on: 'enter' } }] },
         {
           conditions: [{ type: 'inputEquals', value: 'skip2' }],
-          actions: [
-            { type: 'goto', destination: 'nextWhere', properties: { blockStart: true } },
-            { type: 'endTrial' }
-          ]
+          actions: [{ type: 'goto', destination: 'nextWhere', properties: { blockStart: true } }, { type: 'endTrial' }]
         }
       ]
     });
 
-    // Instructions: only Start button (no space key)
-    API.addTrialSets('instructions', [{
-      data: { blockStart: true, block: 0, condition: 'inst', score: 0 },
-      input: [{ handle: 'go', on: 'click', stimHandle: 'touchStartBtn' }],
-      interactions: [
-        { conditions: [{ type: 'begin' }], actions: [{ type: 'showStim', handle: 'All' }] },
-        {
-          conditions: [{ type: 'inputEquals', value: 'go' }],
-          actions: [
-            { type: 'hideStim', handle: 'All' },
-            { type: 'log' },
-            { type: 'trigger', handle: 'endTrial', duration: 200 }
-          ]
-        },
-        { conditions: [{ type: 'inputEquals', value: 'endTrial' }], actions: [{ type: 'endTrial' }] }
-      ]
-    }]);
-
-    // Basic trial templates
-    API.addTrialSets({
-      leftAtt1: [{
-        inherit: 'sort',
-        data: { corResp: 'left' },
-        stimuli: [{ inherit: { type: 'exRandom', set: 'attribute1' } }, { inherit: { set: 'error' } }]
-      }],
-      rightAtt2: [{
-        inherit: 'sort',
-        data: { corResp: 'right' },
-        stimuli: [{ inherit: { type: 'exRandom', set: 'attribute2' } }, { inherit: { set: 'error' } }]
-      }],
-      leftCat: [{
-        inherit: 'sort',
-        data: { corResp: 'left' },
-        stimuli: [{ inherit: { type: 'exRandom', set: 'category' } }, { inherit: { set: 'error' } }]
-      }],
-      rightCat: [{
-        inherit: 'sort',
-        data: { corResp: 'right' },
-        stimuli: [{ inherit: { type: 'exRandom', set: 'category' } }, { inherit: { set: 'error' } }]
-      }]
-    });
-
-    // ===== Logger (CSV, same idea as your desktop version) =====
-    API.addSettings('logger', {
-      onRow: function (logName, log, settings, ctx) {
-        if (!ctx.logs) ctx.logs = [];
-        ctx.logs.push(log);
-      },
-      onEnd: function (name, settings, ctx) {
-        return ctx.logs;
-      },
-      serialize: function (name, logs) {
-        var headers = ['block', 'trial', 'cond', 'type', 'cat', 'stim', 'resp', 'err', 'rt', 'd', 'fb', 'bOrd'];
-
-        var myLogs = [];
-        for (var i = 0; i < logs.length; i++) {
-          if (logs[i] && logs[i].data && logs[i].data.hasOwnProperty('block')) myLogs.push(logs[i]);
-        }
-
-        var content = myLogs.map(function (log) {
-          return [
-            log.data.block,
-            log.trial_id,
-            log.data.condition,
-            log.name,
-            (log.stimuli && log.stimuli[0]) ? log.stimuli[0] : '',
-            (log.media && log.media[0]) ? log.media[0] : '',
-            log.responseHandle || '',
-            log.data.score,
-            log.latency,
-            '',
-            '',
-            ''
-          ];
-        });
-
-        // end row
-        content.push([9, 999, 'end', '', '', '', '', '', '', piCurrent.d, piCurrent.feedback, block2Condition]);
-
-        content.unshift(headers);
-        return toCsv(content);
-
-        function toCsv(m) { return m.map(buildRow).join('\n'); }
-        function buildRow(arr) { return arr.map(normalize).join(','); }
-        function normalize(val) {
-          val = (val === null || val === undefined) ? '' : String(val);
-          if (/(\n|,|")/.test(val)) return '"' + val.replace(/"/g, '""') + '"';
-          return val;
-        }
-      },
-      send: function (name, serialized) {
-        window.minnoJS.logger(serialized);
+    /* ===== Trial: instructions（改成「開始」按鈕；按鈕模擬 Space）===== */
+    API.addTrialSets('instructions', [
+      {
+        data: { blockStart: true, block: 0, condition: 'inst', score: 0 },
+        input: [{ handle: 'space', on: 'space' }],
+        interactions: [
+          { conditions: [{ type: 'begin' }], actions: [{ type: 'showStim', handle: 'All' }] },
+          {
+            conditions: [{ type: 'inputEquals', value: 'space' }],
+            actions: [
+              { type: 'hideStim', handle: 'All' },
+              { type: 'log' },
+              { type: 'trigger', handle: 'endTrial', duration: 300 }
+            ]
+          },
+          { conditions: [{ type: 'inputEquals', value: 'endTrial' }], actions: [{ type: 'endTrial' }] }
+        ]
       }
+    ]);
+
+    /* ===== Basic trials ===== */
+    API.addTrialSets({
+      leftAtt1: [
+        {
+          inherit: 'sort',
+          data: { corResp: 'left' },
+          stimuli: [{ inherit: { type: 'exRandom', set: 'attribute1' } }, { inherit: { set: 'error' } }]
+        }
+      ],
+      rightAtt2: [
+        {
+          inherit: 'sort',
+          data: { corResp: 'right' },
+          stimuli: [{ inherit: { type: 'exRandom', set: 'attribute2' } }, { inherit: { set: 'error' } }]
+        }
+      ],
+      leftCat: [
+        {
+          inherit: 'sort',
+          data: { corResp: 'left' },
+          stimuli: [{ inherit: { type: 'exRandom', set: 'category' } }, { inherit: { set: 'error' } }]
+        }
+      ],
+      rightCat: [
+        {
+          inherit: 'sort',
+          data: { corResp: 'right' },
+          stimuli: [{ inherit: { type: 'exRandom', set: 'category' } }, { inherit: { set: 'error' } }]
+        }
+      ]
     });
 
-    // ===== Sequence builder =====
+    /* ===== Stimulus Sets ===== */
+    API.addStimulusSets({
+      Default: [{ css: { color: 'white', 'font-size': '2em' } }],
+      instructions: [{ css: { 'font-size': '1.4em', color: 'black', lineHeight: 1.2 }, nolog: true, location: { bottom: 16 } }],
+
+      attribute1: [
+        {
+          data: { alias: attribute1, handle: 'targetStim' },
+          inherit: 'Default',
+          css: piCurrent.attribute1.css,
+          media: { inherit: { type: 'exRandom', set: 'attribute1' } }
+        }
+      ],
+      attribute2: [
+        {
+          data: { alias: attribute2, handle: 'targetStim' },
+          inherit: 'Default',
+          css: piCurrent.attribute2.css,
+          media: { inherit: { type: 'exRandom', set: 'attribute2' } }
+        }
+      ],
+      category: [
+        {
+          data: { alias: category, handle: 'targetStim' },
+          inherit: 'Default',
+          css: piCurrent.category.css,
+          media: { inherit: { type: 'exRandom', set: 'category' } }
+        }
+      ],
+
+      error: [{ data: { handle: 'error' }, location: { top: 70 }, css: { color: 'red', 'font-size': '4em' }, media: { word: 'X' }, nolog: true }],
+
+      dummyForLog: [{ data: { name: 'dummyForLog', alias: 'dummyForLog' }, location: { left: 99 }, media: { word: ' ' } }]
+    });
+
+    /* ===== Media Sets ===== */
+    API.addMediaSets({
+      attribute1: piCurrent.attribute1.media,
+      attribute2: piCurrent.attribute2.media,
+      category: piCurrent.category.media
+    });
+
+    /* ===== Instruction helpers ===== */
     function getInstFromTemplate(inText, blockNum, nBlocks) {
-      var t = inText.replace(/attribute1/g, attribute1);
-      t = t.replace(/attribute2/g, attribute2);
-      t = t.replace(/thecategory/g, category);
-      t = t.replace(/blockNum/g, blockNum);
-      t = t.replace(/nBlocks/g, nBlocks);
-      return t;
+      var retText = inText.replace(/attribute1/g, attribute1);
+      retText = retText.replace(/attribute2/g, attribute2);
+      retText = retText.replace(/thecategory/g, category);
+      retText = retText.replace(/blockNum/g, blockNum);
+      retText = retText.replace(/nBlocks/g, nBlocks);
+      return retText;
     }
 
     function getInstHTML(params) {
       var instHTML = '';
-      if (params.isPractice) {
-        instHTML = getInstFromTemplate(piCurrent.instTemplatePractice || '', params.blockNum, params.nBlocks);
-      } else if (params.categorySide == 'rightCat') {
-        instHTML = getInstFromTemplate(piCurrent.instTemplateCategoryRight || '', params.blockNum, params.nBlocks);
-      } else if (params.categorySide == 'leftCat') {
-        instHTML = getInstFromTemplate(piCurrent.instTemplateCategoryLeft || '', params.blockNum, params.nBlocks);
-      }
+      if (params.isPractice) instHTML = getInstFromTemplate(piCurrent.instTemplatePractice, params.blockNum, params.nBlocks);
+      else if (params.categorySide === 'rightCat') instHTML = getInstFromTemplate(piCurrent.instTemplateCategoryRight, params.blockNum, params.nBlocks);
+      else if (params.categorySide === 'leftCat') instHTML = getInstFromTemplate(piCurrent.instTemplateCategoryLeft, params.blockNum, params.nBlocks);
       return instHTML;
     }
 
+    /* ===== Build sequence ===== */
     var trialSequence = [];
 
-    // blockOrder
     var firstCatSide = 'leftCat';
-    if (piCurrent.blockOrder == 'startRight') firstCatSide = 'rightCat';
-    else if (piCurrent.blockOrder == 'random') firstCatSide = (Math.random() < 0.5) ? 'rightCat' : 'leftCat';
+    if (piCurrent.blockOrder === 'startRight') firstCatSide = 'rightCat';
+    else if (piCurrent.blockOrder === 'random') firstCatSide = Math.random() < 0.5 ? 'rightCat' : 'leftCat';
 
     var catSide = '';
+
     for (var iBlock = 1; iBlock <= piCurrent.trialsByBlock.length; iBlock++) {
       var isPrac = false;
       var currentCondition = '';
@@ -464,58 +499,28 @@ define(['pipAPI', 'pipScorer', 'underscore'], function (APIConstructor, Scorer, 
 
       if (piCurrent.trialsByBlock[iBlock - 1].categoryTrials === 0) {
         isPrac = true;
-      } else if (catSide != 'rightCat' && catSide != 'leftCat') {
+      } else if (catSide !== 'rightCat' && catSide !== 'leftCat') {
         catSide = firstCatSide;
-      } else if (piCurrent.switchSideBlock == iBlock || piCurrent.switchSideBlock <= 0) {
-        catSide = (catSide == 'rightCat') ? 'leftCat' : 'rightCat';
+      } else if (piCurrent.switchSideBlock === iBlock || piCurrent.switchSideBlock <= 0) {
+        catSide = catSide === 'rightCat' ? 'leftCat' : 'rightCat';
       }
-
-      var singleAttribute, catAttribute;
 
       if (isPrac) {
         blockLayout = pracLayout;
         currentCondition = attribute1 + ',' + attribute2;
-      } else if (catSide == 'leftCat') {
+      } else if (catSide === 'leftCat') {
         blockLayout = leftLayout;
-        singleAttribute = 'rightAtt2';
-        catAttribute = 'leftAtt1';
         currentCondition = category + '/' + attribute1 + ',' + attribute2;
       } else {
         blockLayout = rightLayout;
-        singleAttribute = 'leftAtt1';
-        catAttribute = 'rightAtt2';
         currentCondition = attribute1 + ',' + attribute2 + '/' + category;
       }
 
       if (iBlock === 2) block2Condition = currentCondition;
 
-      // ===== Dynamic button labels per block (recommended) =====
-      // Practice: left=attribute1, right=attribute2
-      // Combined: show "category 或 attribute" on the side where category appears
-      if (isPrac) {
-        piCurrent.touchLeftDynamicLabel = piCurrent.attribute1.name;
-        piCurrent.touchRightDynamicLabel = piCurrent.attribute2.name;
-      } else if (catSide === 'leftCat') {
-        piCurrent.touchLeftDynamicLabel = piCurrent.category.name + ' 或 ' + piCurrent.attribute1.name;
-        piCurrent.touchRightDynamicLabel = piCurrent.attribute2.name;
-      } else {
-        piCurrent.touchLeftDynamicLabel = piCurrent.attribute1.name;
-        piCurrent.touchRightDynamicLabel = piCurrent.attribute2.name + ' 或 ' + piCurrent.category.name;
-      }
+      var singleAttribute = catSide === 'rightCat' ? 'leftAtt1' : 'rightAtt2';
+      var catAttribute = singleAttribute === 'leftAtt1' ? 'rightAtt2' : 'leftAtt1';
 
-      // Sync top labels too (so participants see exactly the same mapping)
-      piCurrent.leftKeyText = piCurrent.touchLeftDynamicLabel;
-      piCurrent.rightKeyText = piCurrent.touchRightDynamicLabel;
-
-      // refresh layouts’ top labels (because leftLayout/rightLayout were created once)
-      leftLayout[0].media.word = piCurrent.leftKeyText;
-      leftLayout[1].media.word = piCurrent.rightKeyText;
-      rightLayout[0].media.word = piCurrent.leftKeyText;
-      rightLayout[1].media.word = piCurrent.rightKeyText;
-      pracLayout[0].media.word = piCurrent.leftKeyText;
-      pracLayout[1].media.word = piCurrent.rightKeyText;
-
-      // Instructions HTML for this block (you supply instHTML per block in your task)
       var instHTML = piCurrent.trialsByBlock[iBlock - 1].instHTML;
       if (instHTML === '') {
         instHTML = getInstHTML({
@@ -526,18 +531,23 @@ define(['pipAPI', 'pipScorer', 'underscore'], function (APIConstructor, Scorer, 
         });
       }
 
-      // Instructions trial: shows Start button (no space key)
+      // Instructions trial：顯示「開始」按鈕（點擊=Space）
       trialSequence.push({
         inherit: 'instructions',
         data: { blockStart: true },
-        layout: blockLayout,
+        layout: [{ media: { word: '' } }],
         stimuli: [
           { inherit: 'instructions', media: { html: instHTML } },
-          { inherit: { set: 'touchStartBtn' } }
+          {
+            data: { handle: 'touchStart', alias: 'touchStart' },
+            nolog: true,
+            location: { bottom: 3 },
+            css: { width: '70%' },
+            media: { html: makeBtnHtml('minno-touch-start-' + iBlock, piCurrent.touchStartLabel || '開始', ' ') }
+          }
         ]
       });
 
-      // Mini-blocks
       for (var iMini = 1; iMini <= piCurrent.trialsByBlock[iBlock - 1].miniBlocks; iMini++) {
         var mixer = {
           mixer: 'random',
@@ -545,24 +555,24 @@ define(['pipAPI', 'pipScorer', 'underscore'], function (APIConstructor, Scorer, 
             {
               mixer: 'repeat',
               times: piCurrent.trialsByBlock[iBlock - 1].singleAttTrials,
-              data: [{
-                inherit: singleAttribute,
-                data: { condition: currentCondition, block: iBlock },
-                layout: blockLayout
-                  .concat(reminderStimulus)
-                  .concat([{ inherit: { set: 'touchLeftBtn' } }, { inherit: { set: 'touchRightBtn' } }])
-              }]
+              data: [
+                {
+                  inherit: singleAttribute,
+                  data: { condition: currentCondition, block: iBlock },
+                  layout: addTouchToLayout(blockLayout).concat(reminderStimulus)
+                }
+              ]
             },
             {
               mixer: 'repeat',
               times: piCurrent.trialsByBlock[iBlock - 1].sharedAttTrials,
-              data: [{
-                inherit: catAttribute,
-                data: { condition: currentCondition, block: iBlock },
-                layout: blockLayout
-                  .concat(reminderStimulus)
-                  .concat([{ inherit: { set: 'touchLeftBtn' } }, { inherit: { set: 'touchRightBtn' } }])
-              }]
+              data: [
+                {
+                  inherit: catAttribute,
+                  data: { condition: currentCondition, block: iBlock },
+                  layout: addTouchToLayout(blockLayout).concat(reminderStimulus)
+                }
+              ]
             }
           ]
         };
@@ -571,13 +581,13 @@ define(['pipAPI', 'pipScorer', 'underscore'], function (APIConstructor, Scorer, 
           mixer.data.push({
             mixer: 'repeat',
             times: piCurrent.trialsByBlock[iBlock - 1].categoryTrials,
-            data: [{
-              inherit: catSide,
-              data: { condition: currentCondition, block: iBlock },
-              layout: blockLayout
-                .concat(reminderStimulus)
-                .concat([{ inherit: { set: 'touchLeftBtn' } }, { inherit: { set: 'touchRightBtn' } }])
-            }]
+            data: [
+              {
+                inherit: catSide,
+                data: { condition: currentCondition, block: iBlock },
+                layout: addTouchToLayout(blockLayout).concat(reminderStimulus)
+              }
+            ]
           });
         }
 
@@ -585,7 +595,7 @@ define(['pipAPI', 'pipScorer', 'underscore'], function (APIConstructor, Scorer, 
       }
     }
 
-    // Final screen: show Continue button
+    // Final screen：顯示「繼續」按鈕（點擊=Space）
     trialSequence.push({
       inherit: 'instructions',
       data: { blockStart: true },
@@ -594,28 +604,21 @@ define(['pipAPI', 'pipScorer', 'underscore'], function (APIConstructor, Scorer, 
         {
           inherit: 'instructions',
           css: { color: piCurrent.fontColor },
-          media: { html: '<div><p style="font-size:26px; margin:0;">' + piCurrent.finalText + '</p></div>' }
+          media: { html: '<div style="font-size:26px; line-height:1.6; font-family:arial;">' + piCurrent.finalText + '</div>' }
         },
-        { inherit: { set: 'touchContinueBtn' } }
-      ],
-      input: [{ handle: 'done', on: 'click', stimHandle: 'touchContinueBtn' }],
-      interactions: [
-        { conditions: [{ type: 'begin' }], actions: [{ type: 'showStim', handle: 'All' }] },
         {
-          conditions: [{ type: 'inputEquals', value: 'done' }],
-          actions: [
-            { type: 'hideStim', handle: 'All' },
-            { type: 'log' },
-            { type: 'trigger', handle: 'endTrial', duration: 100 }
-          ]
-        },
-        { conditions: [{ type: 'inputEquals', value: 'endTrial' }], actions: [{ type: 'endTrial' }] }
+          data: { handle: 'touchContinue', alias: 'touchContinue' },
+          nolog: true,
+          location: { bottom: 3 },
+          css: { width: '70%' },
+          media: { html: makeBtnHtml('minno-touch-continue-final', piCurrent.touchContinueLabel || '繼續', ' ') }
+        }
       ]
     });
 
     API.addSequence(trialSequence);
 
-    // ===== Scoring =====
+    /* ===== Scoring ===== */
     scorer.addSettings('compute', {
       ErrorVar: 'score',
       condVar: 'condition',
@@ -631,18 +634,8 @@ define(['pipAPI', 'pipScorer', 'underscore'], function (APIConstructor, Scorer, 
       postSettings: { score: 'score', msg: 'feedback', url: '/implicit/scorer' }
     });
 
-    // Messages are typically unused in research; keep empty unless you want participant feedback
-    var messageDef = [
-      { cut: '-0.65', message: '' },
-      { cut: '-0.35', message: '' },
-      { cut: '-0.15', message: '' },
-      { cut: '0.15', message: '' },
-      { cut: '0.35', message: '' },
-      { cut: '0.65', message: '' },
-      { cut: '5', message: '' }
-    ];
-    var scoreMessageObject = { MessageDef: messageDef };
-    scorer.addSettings('message', scoreMessageObject);
+    // feedback messages（如你不使用可留空）
+    scorer.addSettings('message', { MessageDef: [{ cut: '5', message: '' }] });
 
     API.addSettings('hooks', {
       endTask: function () {
