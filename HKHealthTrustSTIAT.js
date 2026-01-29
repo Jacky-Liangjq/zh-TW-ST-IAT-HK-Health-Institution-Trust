@@ -8,13 +8,13 @@ define(
     var API = new APIConstructor();
 
     /* =====================================================
-       目標類別：Health Institutions（香港／繁體；只中文；全部都用）
+       目標類別：Health Institutions（香港／繁體；全部中文）
        ===================================================== */
     var healthInstitutionsAllCN = [
       { word: '醫院管理局' },
       { word: '醫管局' },
+      { word: '衞生署' },
       { word: '衛生署' },
-      { word: '公共衛生署' },
       { word: '衞生防護中心' },
       { word: '衛生防護中心' },
       { word: '政府醫院' },
@@ -26,10 +26,9 @@ define(
     ];
 
     /* =====================================================
-       屬性詞（只中文；斜杠前後都用）
+       屬性詞（可信 / 不可信；斜杠前後全部用）
        ===================================================== */
 
-    // Trustworthy（可信）
     var trustworthyWords = [
       { word: '能力出眾' }, { word: '能幹的' },
       { word: '卓有成效' }, { word: '有效果的' },
@@ -48,7 +47,6 @@ define(
       { word: '言行一致' }, { word: '一致的' }
     ];
 
-    // Untrustworthy（不可信）
     var untrustworthyWords = [
       { word: '平庸無能' }, { word: '無能的' },
       { word: '碌碌無為' }, { word: '徒勞的' },
@@ -68,18 +66,13 @@ define(
     ];
 
     /* =====================================================
-       中文操作指示（香港表達；易懂）
-       - 覆蓋 qstiat6 默認英文 instruction
+       中文操作指示（不含顏色、不含鍵位提示）
        ===================================================== */
     var instHTML = `
       <div style="font-size:20px; line-height:1.75;">
-        <p><b>請你在保持準確的情況下，盡量快速地將詞語歸類。</b></p>
+        <p><b>請在保持準確的情況下，盡量快速地將詞語歸類。</b></p>
 
-        <p>請只使用鍵盤作答：</p>
-        <p>
-          <b>E 鍵（左手）</b>：左邊<br>
-          <b>I 鍵（右手）</b>：右邊
-        </p>
+        <p>詞語會逐一出現，請根據畫面上方的分類提示作答。</p>
 
         <p>如按錯，畫面會顯示紅色「X」，請改按正確的鍵後繼續。</p>
 
@@ -87,16 +80,17 @@ define(
       </div>
     `;
 
+    /* =====================================================
+       統一視覺設定（無顏色、同字號）
+       ===================================================== */
+    var uniformCss = {
+      color: '#000000',
+      'font-size': '2em'
+    };
+
     return stiatExtension({
 
-      /* =====================================================
-         把試次內的錯誤提示改成中文（替代底部英文）
-         ===================================================== */
-      errorMessage: '如按錯，畫面會顯示紅色「X」，請改按正確的鍵後繼續。',
-
-      /* =====================================================
-         每個 block 的說明頁（全中文）
-         ===================================================== */
+      /* block 說明頁（全中文） */
       trialsByBlock: [
         { instHTML: instHTML, block: 1, miniBlocks: 1, singleAttTrials: 10, sharedAttTrials: 10, categoryTrials: 0 },
         { instHTML: instHTML, block: 2, miniBlocks: 1, singleAttTrials: 10, sharedAttTrials: 7,  categoryTrials: 7 },
@@ -105,46 +99,40 @@ define(
         { instHTML: instHTML, block: 5, miniBlocks: 1, singleAttTrials: 0,  sharedAttTrials: 20, categoryTrials: 20 }
       ],
 
-      /* =====================================================
-         目標類別
-         ===================================================== */
+      /* 目標類別 */
       category: {
         name: '健康機構',
         title: {
           media: { word: '健康機構' },
-          css: { color: '#1f77b4', 'font-size': '2em' },
+          css: uniformCss,
           height: 7
         },
         media: healthInstitutionsAllCN,
-        css: { color: '#1f77b4', 'font-size': '3em' }
+        css: uniformCss
       },
 
-      /* =====================================================
-         屬性 1：可信（把鍵位直接寫進標題，降低英文提示干擾）
-         ===================================================== */
+      /* 屬性：可信 */
       attribute1: {
         name: '可信',
         title: {
-          media: { word: 'E 鍵：可信' },
-          css: { color: '#2ca02c', 'font-size': '2em' },
+          media: { word: '可信' },
+          css: uniformCss,
           height: 7
         },
         media: trustworthyWords,
-        css: { color: '#2ca02c', 'font-size': '3em' }
+        css: uniformCss
       },
 
-      /* =====================================================
-         屬性 2：不可信（把鍵位直接寫進標題，降低英文提示干擾）
-         ===================================================== */
+      /* 屬性：不可信 */
       attribute2: {
         name: '不可信',
         title: {
-          media: { word: 'I 鍵：不可信' },
-          css: { color: '#d62728', 'font-size': '2em' },
+          media: { word: '不可信' },
+          css: uniformCss,
           height: 7
         },
         media: untrustworthyWords,
-        css: { color: '#d62728', 'font-size': '3em' }
+        css: uniformCss
       }
     });
   }
