@@ -85,18 +85,18 @@ define(
        ===================================================== */
     var uniformCss = {
       color: '#000000',
-      'font-size': '2em'
+      'font-size': '3em'
     };
 
     return stiatExtension({
 
       /* block 說明頁（全中文） */
       trialsByBlock: [
-        { instHTML: instHTML, block: 1, miniBlocks: 1, singleAttTrials: 10, sharedAttTrials: 10, categoryTrials: 0 },
-        { instHTML: instHTML, block: 2, miniBlocks: 1, singleAttTrials: 10, sharedAttTrials: 7,  categoryTrials: 7 },
-        { instHTML: instHTML, block: 3, miniBlocks: 1, singleAttTrials: 0,  sharedAttTrials: 20, categoryTrials: 20 },
-        { instHTML: instHTML, block: 4, miniBlocks: 1, singleAttTrials: 10, sharedAttTrials: 7,  categoryTrials: 7 },
-        { instHTML: instHTML, block: 5, miniBlocks: 1, singleAttTrials: 0,  sharedAttTrials: 20, categoryTrials: 20 }
+        { instHTML: instHTML, block: 1, miniBlocks: 2, singleAttTrials: 25, sharedAttTrials: 25, categoryTrials: 0 },
+        { instHTML: instHTML, block: 2, miniBlocks: 2, singleAttTrials: 15, sharedAttTrials: 15,  categoryTrials: 10 },
+        { instHTML: instHTML, block: 3, miniBlocks: 2, singleAttTrials: 15,  sharedAttTrials: 15, categoryTrials: 10 },
+        { instHTML: instHTML, block: 4, miniBlocks: 2, singleAttTrials: 15, sharedAttTrials: 15,  categoryTrials: 10 },
+        { instHTML: instHTML, block: 5, miniBlocks: 2, singleAttTrials: 15,  sharedAttTrials: 15, categoryTrials: 10 }
       ],
 
       /* 目標類別 */
