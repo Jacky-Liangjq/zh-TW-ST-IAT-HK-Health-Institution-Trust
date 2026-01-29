@@ -85,7 +85,7 @@ define(
        ===================================================== */
     var uniformCss = {
       color: '#000000',
-      'font-size': '3em'
+      'font-size': '2em'
     };
 
     return stiatExtension({
