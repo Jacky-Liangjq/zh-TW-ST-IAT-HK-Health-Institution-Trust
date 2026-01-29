@@ -2,7 +2,7 @@ define(
   [
     'pipAPI',
     // ✅ 改这里：桌面用 qstiat6.js；移动端用 qstiat6-mobile.js
-    'https://cdn.jsdelivr.net/gh/Jacky-Liangjq/zh-TW-ST-IAT-HK-Health-Institution-Trust@23ef6c5c174135b0cb29fa36565071a6a93b5c77/qstiat6-mobile.js'
+    'https://cdn.jsdelivr.net/gh/Jacky-Liangjq/zh-TW-ST-IAT-HK-Health-Institution-Trust@7be6850dbc50784d61f1dc2f504822c60e1cf3d6/qstiat6-mobile.js'
   ],
   function (APIConstructor, stiatExtension) {
 
