@@ -66,7 +66,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 
 			leftKeyText : '按 E 鍵',
 			rightKeyText : '按 I 鍵',
-			keysCss : {'font-size':'1.5em','font-family':'monospace',color:'#000000'},
+			keysCss : {'font-size':'1.3em','font-family':'monospace',color:'#000000'},
 
 			orText : '或',
 			orCss : {'font-size':'1.4em',color:'#000000'},
