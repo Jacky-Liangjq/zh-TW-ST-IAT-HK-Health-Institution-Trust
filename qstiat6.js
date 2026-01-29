@@ -8,7 +8,6 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 
 		var stiatObj = 
 		{
-			//Set the canvas of the task
 			canvas : {
 				maxWidth: 725,
 				proportions : 0.7,
@@ -17,211 +16,111 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 				canvasBackground: '#ffffff',
 				borderColor: 'lightblue'
 			}, 
-			//Define the category.
-			category :  
-			{
-				name : 'Black People', //Category name to be used for feedback and logging.
+
+			category : {
+				name : '目標對象',
 				title : {
-					media : {word : 'Black People'}, //Name of the category presented in the task.
-					css : {color:'#31b404','font-size':'2em'}, //Style of the category title.
-					height : 4 //Used to position the "Or" in the combined block.
-				}, 
-				media : [ //Stimuli
-					{word: 'Tyron'},
-					{word: 'Malik'},
-					{word: 'Terrell'},
-					{word: 'Jazmin'},
-					{word: 'Tiara'},
-					{word: 'Shanice'}
-				],
-				//Can change color and size of the targets here.
+					media : {word : '目標對象'},
+					css : {color:'#31b404','font-size':'2em'},
+					height : 4
+				},
+				media : [],
 				css : {color:'#31b404','font-size':'2em'}
 			},	
-			attribute1 : 
-			{
-				name : 'Unpleasant', //Attribute name to be used for feedback and logging
+
+			attribute1 : {
+				name : '正向',
 				title : {
-					media : {word : 'Unpleasant'}, //Name of the category presented in the task.
-					css : {color:'#31b404','font-size':'2em'}, //Style of the category title.
-					height : 4 //Used to position the "Or" in the combined block.
-				}, 
-				media : [ //Stimuli
-					{word: 'Bomb'},
-					{word: 'Abuse'},
-					{word: 'Sadness'},
-					{word: 'Pain'},
-					{word: 'Poison'},
-					{word: 'Grief'}
-				], 
-				//Can change color and size of the targets here.
+					media : {word : '正面'},
+					css : {color:'#31b404','font-size':'2em'},
+					height : 4
+				},
+				media : [],
 				css : {color:'#31b404','font-size':'2em'}
 			},
-			attribute2 : 
-			{
-				name : 'Pleasant', //Attribute name to be used for feedback and logging
+
+			attribute2 : {
+				name : '負向',
 				title : {
-					media : {word : 'Pleasant'}, //Name of the category presented in the task.
-					css : {color:'#31b404','font-size':'2em'}, //Style of the category title.
-					height : 4 //Used to position the "Or" in the combined block.
-				}, 
-				media : [ //Stimuli
-					{word: 'Paradise'},
-					{word: 'Pleasure'},
-					{word: 'Cheer'},
-					{word: 'Wonderful'},
-					{word: 'Splendid'},
-					{word: 'Love'}
-				], 
-				//Can change color and size of the targets here.
+					media : {word : '負面'},
+					css : {color:'#31b404','font-size':'2em'},
+					height : 4
+				},
+				media : [],
 				css : {color:'#31b404','font-size':'2em'}
-			},	
-			trialsByBlock : 
-			[//Each object in this array defines a block
-				{
-					instHTML : '', //Empty means we will create the inst from the instTemplate variable further below. 
-					block : 1, //The block variable is not used later, but could help the user. 
-					//In each block, we can include a number of mini-blocks, to reduce repetition of same group/response.
-					miniBlocks : 1, //Set to 1 if don't need mini blocks. 0 will break the task.
-					singleAttTrials : 10, //Number of trials of the attribute that does not share key with the category (in a mini block).
-					sharedAttTrials : 10, //Number of trials of the attribute that shares key with the category (in a mini block).
-					categoryTrials : 0 // Number of trials of the category (in a mini-block). If 0, the label does not appear.
-					//Note: if no category trials, then attribute1, the one on the left, is considered the single attribute.
-				}, 
-				{ 
-					instHTML : '', 
-					block : 2, 
-					miniBlocks : 2, 
-					singleAttTrials : 10, 
-					sharedAttTrials : 7, 
-					categoryTrials : 7
-				}, 
-				{ 
-					instHTML : '', 
-					block : 3, 
-					miniBlocks : 2, 
-					singleAttTrials : 10, 
-					sharedAttTrials : 7, 
-					categoryTrials : 7
-				}, 
-				{ 
-					instHTML : '', 
-					block : 4, 
-					miniBlocks : 2, 
-					singleAttTrials : 10, 
-					sharedAttTrials : 7, 
-					categoryTrials : 7
-				}, 
-				{ 
-					instHTML : '', 
-					block : 5, 
-					miniBlocks : 2, 
-					singleAttTrials : 10, 
-					sharedAttTrials : 7, 
-					categoryTrials : 7
-				}
+			},
+
+			trialsByBlock : [
+				{ instHTML:'', block:1, miniBlocks:1, singleAttTrials:10, sharedAttTrials:10, categoryTrials:0 },
+				{ instHTML:'', block:2, miniBlocks:2, singleAttTrials:10, sharedAttTrials:7, categoryTrials:7 },
+				{ instHTML:'', block:3, miniBlocks:2, singleAttTrials:10, sharedAttTrials:7, categoryTrials:7 },
+				{ instHTML:'', block:4, miniBlocks:2, singleAttTrials:10, sharedAttTrials:7, categoryTrials:7 },
+				{ instHTML:'', block:5, miniBlocks:2, singleAttTrials:10, sharedAttTrials:7, categoryTrials:7 }
 			],
-			//All blocks show attribute1 on the left and attribute2 on the right. 
-			//blockOrder can be: 'startRight', 'startLeft', and 'random'
-			blockOrder : 'random', 
-			//Change to 'startRight' if you want to start with category on the right in the first block. 
-			//Change to 'startLeft' if you want to start with category on the left in the first block. 
-			//Change to 'random' if you want to randomize whether the category starts on the left or on the right.
-			//NOTICE: to know what the block-order condition is, we save the pairing definition of the second block, 
-			//into the explicit table, under the variable name block2Condition.
 
-			//If the switch parameter is 0 or smaller, we switch the side of the category every block. 
-			//If it is larger than 0, then we switch the category side only once, in the block specified in switchSideBlock.
-			switchSideBlock : 4, //By default, we switch on block 4 (i.e., after blocks 2 and 3 showed the first pairing condition).
+			blockOrder : 'random',
+			switchSideBlock : 4,
 
-			base_url : {//Where are your images?
-				image : '/implicit/user/yba/pipexample/stiat/images/'
-			}, 
-			ITIDuration : 250, //Duration between trials.
-			
-			fontColor : '#000000', //The color of messages and key reminders. 
-			
-			//Text and style for key instructions displayed about the category labels.
-			leftKeyText : '按 E 鍵', 
-			rightKeyText : '按 I 鍵', 
-			keysCss : {'font-size':'0.8em', 'font-family':'courier', color:'#000000'},
-			//Text and style for the separator between the top and bottom category labels.
-			orText : 'or', 
-			orCss : {'font-size':'1.8em', color:'#000000'},
+			ITIDuration : 250,
+			fontColor : '#000000',
 
-			//Will appear at the bottom of the screen during trials.
-			remindErrorText : '<p align="center" style="font-size:"0.6em"; font-family:arial">' +
-			'如按錯，畫面會顯示紅色 <font color="#ff0000"><b>X</b></font> 。' +
-			'請改按另一個鍵後繼續。<p/>',
-			
-			finalText: '已經完成任務<br/><br/>請按空格鍵。', 
+			leftKeyText : '按 E 鍵',
+			rightKeyText : '按 I 鍵',
+			keysCss : {'font-size':'0.9em','font-family':'monospace',color:'#000000'},
 
-			//These are templates for the instructions in the task. 
-			//If you want more specific instructions for different blocks, 
-			// use the instHTML variables above. 
-			// The following variables in the instructions text will be replaced: 
-			// blockNum, nBlocks, attribute1, attribute2, and thecategory.
-			// Notice that this is HTML text.
-			instTemplatePractice : '<div><p align="center" style="font-size:20px; font-family:arial">' +
-				'<font color="#000000"><u>Part blockNum of nBlocks</u><br/><br/></p>' + 
-				'<p style="font-size:20px; text-align:left; vertical-align:bottom; margin-left:10px; font-family:arial">' +
-				'Put a left finger on the <b>E</b> key for items that belong to the category ' + 
-				'<font color="#31b404">attribute1</font>.<br/>' + 
-				'Put a right finger on the <b>I</b> key for items that belong to the category ' + 
-				'<font color="#31b404">attribute2</font>.<br/>' + 
-				'Items will appear one at a time.<br/><br/>' + 
-				'If you make a mistake, a red <font color="#ff0000"><b>X</b></font> will appear. ' + 
-				'請改按另一個鍵後繼續。<br/><br/>' + 
-				'<p align="center">準備就緒後請按*空格鍵*開始。</font></p></div>', 
-			instTemplateCategoryRight : '<div><p align="center" style="font-size:20px; font-family:arial">' +
-				'<font color="#000000"><u>Part blockNum of nBlocks </u><br/><br/></p>' + 
-				'<p style="font-size:20px; text-align:left; vertical-align:bottom; margin-left:10px; font-family:arial">' +
-				'Put a left finger on the <b>E</b> key for items that belong to the category ' + 
-				'<font color="#31b404">attribute1</font>.<br/>' + 
-				'Put a right finger on the <b>I</b> key for items that belong to the category ' + 
-				'<font color="#31b404">attribute2</font> ' +
-				'and for items that belong to the category <font color="#31b404">thecategory</font>.<br/>' + 
-				'Items will appear one at a time.<br/><br/>' + 
-				'If you make a mistake, a red <font color="#ff0000"><b>X</b></font> will appear. ' + 
-				'請改按另一個鍵後繼續。<br/><br/>' + 
-				'<p align="center">準備就緒後請按*空格鍵*開始。</font></p></div>', 
-			instTemplateCategoryLeft : '<div><p align="center" style="font-size:20px; font-family:arial">' +
-				'<font color="#000000"><u>Part blockNum of nBlocks </u><br/><br/></p>' + 
-				'<p style="font-size:20px; text-align:left; vertical-align:bottom; margin-left:10px; font-family:arial">' +
-				'Put a left finger on the <b>E</b> key for items that belong to the category ' + 
-				'<font color="#31b404">attribute1</font> ' +
-				'and for items that belong to the category <font color="#31b404">thecategory</font>.<br/>' + 
-				'Put a right finger on the <b>I</b> key for items that belong to the category ' + 
-				'<font color="#31b404">attribute2</font>.<br/>' + 
-				'Items will appear one at a time.<br/><br/>' + 
-				'If you make a mistake, a red <font color="#ff0000"><b>X</b></font> will appear. ' + 
-				'準備就緒後請按*空格鍵*開始。<br/><br/>' + 
-				'<p align="center">準備就緒後請按*空格鍵*開始。</font></p></div>', 
-			
-			//The default feedback messages for each cutoff. 
-			//If you put attribute1, attribute2 and category here, 
-			//these will be replaced with the names of attribute1, attribute2 and category.
-			fb_strongAssociationWithAttribute2 : 'Your data suggest a strong positive automatic attitude toward thecategory.',
-			fb_moderateAssociationWithAttribute2 : 'Your data suggest a moderate positive automatic attitude toward thecategory.',
-			fb_weakAssociationWithAttribute2 : 'Your data suggest a weak positive automatic attitude toward thecategory.',
-			fb_neutralAssociation : 'Your data suggest a neutral automatic attitude toward thecategory.',
-			fb_weakAssociationWithAttribute1 : 'Your data suggest a weak negative automatic attitude toward thecategory.' ,
-			fb_moderateAssociationWithAttribute1 : 'Your data suggest a moderate negative automatic attitude toward thecategory.' ,
-			fb_strongAssociationWithAttribute1 : 'Your data suggest a strong negative automatic attitude toward thecategory.', 
-			
-			//Error messages in the scorer. If empty then we use the scorer's default messages.
-			manyErrors: '',
-			tooFast: '',
-			notEnough: '' //Usually relevant only if skipped the task.
+			orText : '或',
+			orCss : {'font-size':'1.4em',color:'#000000'},
+
+			remindErrorText :
+				'<p style="text-align:center;font-size:0.9em">' +
+				'如果按錯，畫面會顯示紅色 <b style="color:red">X</b>。<br/>' +
+				'請即時改按正確按鍵以繼續。</p>',
+
+			finalText : '任務已完成。<br/><br/>請按空格鍵繼續。',
+
+			instTemplatePractice :
+				'<div style="font-size:20px;line-height:1.6">' +
+				'<p style="text-align:center"><u>第 blockNum 部分（共 nBlocks 部分）</u></p>' +
+				'<p>' +
+				'當畫面出現屬於 <b>attribute1</b> 的詞語，請按 <b>E</b> 鍵。<br/>' +
+				'當畫面出現屬於 <b>attribute2</b> 的詞語，請按 <b>I</b> 鍵。<br/><br/>' +
+				'詞語會逐一出現，請盡量快速而準確地作答。<br/><br/>' +
+				'準備好後，請按 <b>空格鍵</b> 開始。</p></div>',
+
+			instTemplateCategoryRight :
+				'<div style="font-size:20px;line-height:1.6">' +
+				'<p style="text-align:center"><u>第 blockNum 部分（共 nBlocks 部分）</u></p>' +
+				'<p>' +
+				'屬於 <b>attribute1</b> 的詞語，請按 <b>E</b> 鍵。<br/>' +
+				'屬於 <b>attribute2</b> 或 <b>thecategory</b> 的詞語，請按 <b>I</b> 鍵。<br/><br/>' +
+				'請盡量快速而準確地作答。<br/><br/>' +
+				'準備好後，請按 <b>空格鍵</b> 開始。</p></div>',
+
+			instTemplateCategoryLeft :
+				'<div style="font-size:20px;line-height:1.6">' +
+				'<p style="text-align:center"><u>第 blockNum 部分（共 nBlocks 部分）</u></p>' +
+				'<p>' +
+				'屬於 <b>attribute1</b> 或 <b>thecategory</b> 的詞語，請按 <b>E</b> 鍵。<br/>' +
+				'屬於 <b>attribute2</b> 的詞語，請按 <b>I</b> 鍵。<br/><br/>' +
+				'準備好後，請按 <b>空格鍵</b> 開始。</p></div>',
+
+			fb_strongAssociationWithAttribute2 : '你的反應顯示，你對 thecategory 的自動反應非常正面。',
+			fb_moderateAssociationWithAttribute2 : '你的反應顯示，你對 thecategory 的自動反應較為正面。',
+			fb_weakAssociationWithAttribute2 : '你的反應顯示，你對 thecategory 的自動反應略為正面。',
+			fb_neutralAssociation : '你的反應顯示，你對 thecategory 並無明顯的自動反應傾向。',
+			fb_weakAssociationWithAttribute1 : '你的反應顯示，你對 thecategory 的自動反應略為負面。',
+			fb_moderateAssociationWithAttribute1 : '你的反應顯示，你對 thecategory 的自動反應較為負面。',
+			fb_strongAssociationWithAttribute1 : '你的反應顯示，你對 thecategory 的自動反應非常負面。',
+
+			manyErrors : '',
+			tooFast : '',
+			notEnough : ''
 		};
 
-		// extend the current object with the default
 		_.extend(piCurrent, _.defaults(options, stiatObj));
 
-		
-		/**
-        **** For Qualtrics
-        */
-        API.addSettings('onEnd', window.minnoJS.onEnd);
+		API.addSettings('onEnd', window.minnoJS.onEnd);
+
 
 		//For debugging the logger
 		//window.minnoJS.logger = console.log;
