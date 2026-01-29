@@ -1,33 +1,21 @@
 define(
   [
     'pipAPI',
-    'https://cdn.jsdelivr.net/gh/Jacky-Liangjq/zh-TW-ST-IAT-HK-Health-Institution-Trust@ae0ef330b42d5b2b39b17e33ce824321a5e2fc42/qstiat6.js'
+    // ✅ 改这里：桌面用 qstiat6.js；移动端用 qstiat6-mobile.js
+    'https://cdn.jsdelivr.net/gh/Jacky-Liangjq/zh-TW-ST-IAT-HK-Health-Institution-Trust@23ef6c5c174135b0cb29fa36565071a6a93b5c77/qstiat6-mobile.js'
   ],
   function (APIConstructor, stiatExtension) {
 
     var API = new APIConstructor();
 
-    /* =====================================================
-       目標類別：Health Institutions（香港／繁體；全部中文）
-       ===================================================== */
     var healthInstitutionsAllCN = [
-      { word: '醫院管理局' },
-      { word: '醫管局' },
-      { word: '衞生署' },
-      { word: '衛生署' },
-      { word: '衞生防護中心' },
-      { word: '衛生防護中心' },
-      { word: '政府醫院' },
-      { word: '公立醫院' },
-      { word: '公共醫療體系' },
-      { word: '基層醫療系統' },
-      { word: '社區健康中心' },
-      { word: '公共醫療機構' }
+      { word: '醫院管理局' }, { word: '醫管局' },
+      { word: '衞生署' }, { word: '衛生署' },
+      { word: '衞生防護中心' }, { word: '衛生防護中心' },
+      { word: '政府醫院' }, { word: '公立醫院' },
+      { word: '公共醫療體系' }, { word: '基層醫療系統' },
+      { word: '社區健康中心' }, { word: '公共醫療機構' }
     ];
-
-    /* =====================================================
-       屬性詞（可信 / 不可信；斜杠前後全部用）
-       ===================================================== */
 
     var trustworthyWords = [
       { word: '能力出眾' }, { word: '能幹的' },
@@ -65,74 +53,54 @@ define(
       { word: '反覆無常' }, { word: '矛盾的' }
     ];
 
-    /* =====================================================
-       中文操作指示（不含顏色、不含鍵位提示）
-       ===================================================== */
+    // ✅ 改这里：移动端不说空格键
     var instHTML = `
       <div style="font-size:20px; line-height:1.75;">
         <p><b>請在保持準確的情況下，盡量快速地將詞語歸類。</b></p>
-
         <p>詞語會逐一出現，請根據畫面上方的分類提示作答。</p>
-
-        <p>如按錯，畫面會顯示紅色「X」，請改按正確的鍵後繼續。</p>
-
-        <p>準備好後，請按空白鍵開始。</p>
+        <p>如按錯，畫面會顯示紅色「X」，請改按正確一邊後繼續。</p>
+        <p>準備好後，請按畫面上的「開始」。</p>
       </div>
     `;
 
-    /* =====================================================
-       統一視覺設定（無顏色、同字號）
-       ===================================================== */
-    var uniformCss = {
-      color: '#000000',
-      'font-size': '2em'
-    };
+    var uniformCss = { color: '#000000', 'font-size': '2em' };
 
     return stiatExtension({
-
-      /* block 說明頁（全中文） */
+      // ✅ 你原本的 block 参数保持不变
       trialsByBlock: [
         { instHTML: instHTML, block: 1, miniBlocks: 2, singleAttTrials: 15, sharedAttTrials: 15, categoryTrials: 0 },
-        { instHTML: instHTML, block: 2, miniBlocks: 2, singleAttTrials: 10, sharedAttTrials: 10,  categoryTrials: 5 },
-        { instHTML: instHTML, block: 3, miniBlocks: 2, singleAttTrials: 10,  sharedAttTrials: 10, categoryTrials: 5 },
-        { instHTML: instHTML, block: 4, miniBlocks: 2, singleAttTrials: 10, sharedAttTrials: 10,  categoryTrials: 5 },
-        { instHTML: instHTML, block: 5, miniBlocks: 2, singleAttTrials: 10,  sharedAttTrials: 10, categoryTrials: 5 }
+        { instHTML: instHTML, block: 2, miniBlocks: 2, singleAttTrials: 10, sharedAttTrials: 10, categoryTrials: 5 },
+        { instHTML: instHTML, block: 3, miniBlocks: 2, singleAttTrials: 10, sharedAttTrials: 10, categoryTrials: 5 },
+        { instHTML: instHTML, block: 4, miniBlocks: 2, singleAttTrials: 10, sharedAttTrials: 10, categoryTrials: 5 },
+        { instHTML: instHTML, block: 5, miniBlocks: 2, singleAttTrials: 10, sharedAttTrials: 10, categoryTrials: 5 }
       ],
 
-      /* 目標類別 */
+      // ✅ 这三项你已经统一成黑色同字号，保留即可
       category: {
         name: '健康機構',
-        title: {
-          media: { word: '健康機構' },
-          css: uniformCss,
-          height: 7
-        },
+        title: { media: { word: '健康機構' }, css: uniformCss, height: 7 },
         media: healthInstitutionsAllCN,
         css: uniformCss
       },
-
-      /* 屬性：可信 */
       attribute1: {
         name: '可信',
-        title: {
-          media: { word: '可信' },
-          css: uniformCss,
-          height: 7
-        },
+        title: { media: { word: '可信' }, css: uniformCss, height: 7 },
         media: trustworthyWords,
         css: uniformCss
       },
-
-      /* 屬性：不可信 */
       attribute2: {
         name: '不可信',
-        title: {
-          media: { word: '不可信' },
-          css: uniformCss,
-          height: 7
-        },
+        title: { media: { word: '不可信' }, css: uniformCss, height: 7 },
         media: untrustworthyWords,
         css: uniformCss
+      },
+
+      // ✅ 可选：移动端按钮文字（若你的 qstiat6-mobile.js 支持 touchButtons）
+      touchButtons: {
+        leftLabel: '可信',
+        rightLabel: '不可信',
+        startLabel: '開始',
+        continueLabel: '繼續'
       }
     });
   }
