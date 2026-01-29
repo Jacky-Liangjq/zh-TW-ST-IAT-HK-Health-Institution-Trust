@@ -92,11 +92,11 @@ define(
 
       /* block 說明頁（全中文） */
       trialsByBlock: [
-        { instHTML: instHTML, block: 1, miniBlocks: 2, singleAttTrials: 25, sharedAttTrials: 25, categoryTrials: 0 },
-        { instHTML: instHTML, block: 2, miniBlocks: 2, singleAttTrials: 15, sharedAttTrials: 15,  categoryTrials: 10 },
-        { instHTML: instHTML, block: 3, miniBlocks: 2, singleAttTrials: 15,  sharedAttTrials: 15, categoryTrials: 10 },
-        { instHTML: instHTML, block: 4, miniBlocks: 2, singleAttTrials: 15, sharedAttTrials: 15,  categoryTrials: 10 },
-        { instHTML: instHTML, block: 5, miniBlocks: 2, singleAttTrials: 15,  sharedAttTrials: 15, categoryTrials: 10 }
+        { instHTML: instHTML, block: 1, miniBlocks: 2, singleAttTrials: 15, sharedAttTrials: 15, categoryTrials: 0 },
+        { instHTML: instHTML, block: 2, miniBlocks: 2, singleAttTrials: 10, sharedAttTrials: 10,  categoryTrials: 5 },
+        { instHTML: instHTML, block: 3, miniBlocks: 2, singleAttTrials: 10,  sharedAttTrials: 10, categoryTrials: 5 },
+        { instHTML: instHTML, block: 4, miniBlocks: 2, singleAttTrials: 10, sharedAttTrials: 10,  categoryTrials: 5 },
+        { instHTML: instHTML, block: 5, miniBlocks: 2, singleAttTrials: 10,  sharedAttTrials: 10, categoryTrials: 5 }
       ],
 
       /* 目標類別 */
