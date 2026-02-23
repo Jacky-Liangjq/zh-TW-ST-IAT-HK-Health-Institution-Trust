@@ -87,14 +87,14 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			    data: { handle: 'leftTapZone' },
 			    size: { height: 100, width: 50 },    // height in pixels or grid units; adjust if needed
 			    location: { left: 0, top: 0 },
-			    css: { opacity: 0.15, zindex: 1 },       // set opacity:0.2 for visible debug
+			    css: { opacity: 0.25, background: '#00ff00', border: '2px solid #008000', zIndex: 999 },       // set opacity:0.2 for visible debug
 			    media: { word: ' ' }
 			  },
 			  {
 			    data: { handle: 'rightTapZone' },
 			    size: { height: 100, width: 50 },
 			    location: { right: 0, top: 0 },
-			    css: { opacity: 0.15, zindex: 1 },       // set opacity:0.2 for visible debug
+			    css: { opacity: 0.25, background: '#00ff00', border: '2px solid #008000', zIndex: 999 },       // set opacity:0.2 for visible debug
 			    media: { word: ' ' }
 			  }
 			],
@@ -668,7 +668,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 							[{
 								inherit : singleAttribute, 
 								data : {condition : currentCondition, block : iBlock}, 
-								layout : blockLayout.concat(reminderStimulus)
+								layout : blockLayout.concat(reminderStimulus).concat(piCurrent.touchInputStimuli)
 							}]
 						}, 
 						{//The key-shared attribute trials
@@ -678,7 +678,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 							[{
 								inherit : catAttribute, 
 								data : {condition : currentCondition, block : iBlock}, 
-								layout : blockLayout.concat(reminderStimulus)
+								layout : blockLayout.concat(reminderStimulus).concat(piCurrent.touchInputStimuli)
 							}]
 						} 
 					]
@@ -693,7 +693,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 							[{
 								inherit : catSide, 
 								data : {condition : currentCondition, block : iBlock}, 
-								layout : blockLayout.concat(reminderStimulus)
+								layout : blockLayout.concat(reminderStimulus).concat(piCurrent.touchInputStimuli)
 							}]
 						}
 					);
@@ -723,7 +723,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 		      data: { handle:'continueTapZone' },
 		      size: { height: 25, width: 100 },
 		      location: { left: 0, bottom: 0 },
-		      css: { opacity: 0.15, zindex: 2 },
+		      css: { opacity: 0.25, background: '#00ff00', border: '2px solid #008000', zIndex: 999 }},
 		      media: { word: ' ' }
 		    }
 		  ]
