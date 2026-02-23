@@ -637,24 +637,24 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			    inherit : 'instructions', 
 			    data: {blockStart:true},
 			    layout : blockLayout, 
-			    stimuli : [
-			      { 
-			        inherit : 'instructions', 
-			        media : {html : instHTML}
-			      },
-			      {
-			        data : {handle:'dummy', alias:'dummy'},
-			        media : {word:' '}, 
-			        location : {top:1}
-			      },
-			      {
-			        data: { handle:'continueTapZone' },
-			        size: { height: 25, width: 100 },
-			        location: { left: 0, bottom: 0 },
-			      	css: { opacity: 0.25, background: '#00ff00', border: '2px solid #008000', zIndex: 999 },
-			        media: { word: ' ' }
-			      }
-			    ]
+				stimuli : [
+				  { 
+				    inherit : 'instructions', 
+				    media : {html : instHTML}
+				  },
+				  {
+				    data : {handle:'dummy', alias:'dummy'},
+				    media : {word:' '}, 
+				    location : {top:1}
+				  },
+				  {
+				    data: { handle:'continueTapZone' },
+				    size: { height: 25, width: 100 },
+				    location: { left: 0, bottom: 0 },
+				    css: { opacity: 0.25, background: '#00ff00', border: '2px solid #008000', zIndex: 999 },
+				    media: { word: ' ' }
+				  }
+				]
 			  }
 			);
 			
@@ -709,29 +709,27 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 		//Add the final goodbye trial.
 		//Add the final goodbye trial.
 		trialSequence.push({
-		  inherit : 'instructions', 
-		  data: {blockStart:true},
-		  layout : [{media:{word:''}}], 
-		  stimuli : [
-		    { 
-		      inherit : 'instructions', 
-		      css : {color:piCurrent.fontColor}, 
-		      media:{html:'<div><p style="font-size:28px"><color="#000000">' + 
-		      piCurrent.finalText + '</p></div>'}
-		    },
-		    {
-		      data : {handle:'dummy', alias:'dummy'},
-		      media : {word:' '}, 
-		      location : {top:1}
-		    },
-		    {
-		      data: { handle:'continueTapZone' },
-		      size: { height: 25, width: 100 },
-		      location: { left: 0, bottom: 0 },
-		      css: { opacity: 0.25, background: '#00ff00', border: '2px solid #008000', zIndex: 999 }},
-		      media: { word: ' ' }
-		    }
-		  ]
+			inherit : 'instructions', 
+			data: {blockStart:true},
+			layout : [{media:{word:''}}], 
+			stimuli : [
+			  { 
+			    inherit : 'instructions', 
+			    media : {html : instHTML}
+			  },
+			  {
+			    data : {handle:'dummy', alias:'dummy'},
+			    media : {word:' '}, 
+			    location : {top:1}
+			  },
+			  {
+			    data: { handle:'continueTapZone' },
+			    size: { height: 25, width: 100 },
+			    location: { left: 0, bottom: 0 },
+			    css: { opacity: 0.25, background: '#00ff00', border: '2px solid #008000', zIndex: 999 },
+			    media: { word: ' ' }
+			  }
+			]
 		});
 		//Now add the trials sequence to the API.
 		API.addSequence(trialSequence);
