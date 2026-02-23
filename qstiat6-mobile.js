@@ -64,6 +64,8 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			ITIDuration : 250,
 			fontColor : '#000000',
 
+			isTouch: true,
+
 			leftKeyText : '按 E 鍵',
 			rightKeyText : '按 I 鍵',
 			keysCss : {'font-size':'1.3em','font-family':'monospace',color:'#000000'},
