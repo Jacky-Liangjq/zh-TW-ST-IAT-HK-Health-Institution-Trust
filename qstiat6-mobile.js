@@ -5,6 +5,11 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 		var API = new APIConstructor();
 		var scorer = new Scorer();
 		var piCurrent = API.getCurrent();
+		var isTouch = !!piCurrent.isTouch;
+		if (isTouch){
+		  piCurrent.leftKeyText = piCurrent.leftKeyTextTouch || piCurrent.leftKeyText;
+		  piCurrent.rightKeyText = piCurrent.rightKeyTextTouch || piCurrent.rightKeyText;
+		}
 
 		var stiatObj = 
 		{
@@ -301,9 +306,17 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			data: {score:0, parcel:'first'},
 			// set the interface for trials
 			input: [
-				{handle:'skip1',on:'keypressed', key:27}, //Esc + Enter will skip blocks
-				{handle:'left',on:'keypressed',key:'e'},
-				{handle:'right',on:'keypressed',key:'i'}
+			  {handle:'skip1', on:'keypressed', key:27},
+			
+			  // left response
+			  !isTouch
+			    ? {handle:'left', on:'keypressed', key:'e'}
+			    : {handle:'left', on:'click', stimHandle:'leftTapZone'},
+			
+			  // right response
+			  !isTouch
+			    ? {handle:'right', on:'keypressed', key:'i'}
+			    : {handle:'right', on:'click', stimHandle:'rightTapZone'}
 			],
 
 			// user interactions
