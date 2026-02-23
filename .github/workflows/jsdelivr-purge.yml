@@ -1,0 +1,18 @@
+name: Purge jsDelivr cache
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Purge jsDelivr cache
+        uses: egad13/purge-jsdelivr-cache@v1
+        with:
+          urls: |
+            https://cdn.jsdelivr.net/gh/Jacky-Liangjq/zh-TW-ST-IAT-HK-Health-Institution-Trust@main/HKHealthTrustSTIAT-mobile.js,
+            https://cdn.jsdelivr.net/gh/Jacky-Liangjq/zh-TW-ST-IAT-HK-Health-Institution-Trust@main/qstiat6-mobile.js
+            https://cdn.jsdelivr.net/gh/Jacky-Liangjq/zh-TW-ST-IAT-HK-Health-Institution-Trust@main/HKHealthTrustSTIAT.js,
+            https://cdn.jsdelivr.net/gh/Jacky-Liangjq/zh-TW-ST-IAT-HK-Health-Institution-Trust@main/qstiat6.js        
