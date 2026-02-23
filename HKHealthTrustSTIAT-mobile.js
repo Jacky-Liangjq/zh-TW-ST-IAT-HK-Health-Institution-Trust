@@ -11,11 +11,8 @@ define(
        目標類別：Health Institutions（香港／繁體；全部中文）
        ===================================================== */
     var healthInstitutionsAllCN = [
-      { word: '醫院管理局' },
       { word: '醫管局' },
-      { word: '衞生署' },
       { word: '衛生署' },
-      { word: '衞生防護中心' },
       { word: '衛生防護中心' },
       { word: '政府醫院' },
       { word: '公立醫院' },
@@ -25,6 +22,26 @@ define(
       { word: '公共醫療機構' }
     ];
 
+        /* =====================================================
+       對照類別：生活服務機構
+       ===================================================== */
+    var nonHealthInstitutionsCN = [
+      { word: '超市' },
+      { word: '銀行' },
+      { word: '地鐵站' },
+      { word: '餐廳' },
+      { word: '郵局' },
+      { word: '書店' },
+      { word: '電影院' },
+      { word: '健身中心' },
+      { word: '旅遊社' },
+      { word: '保險公司' },
+      { word: '百貨公司' },
+      { word: '商場' },
+      { word: '學校' }
+    ];
+
+    
     /* =====================================================
        屬性詞（可信 / 不可信；斜杠前後全部用）
        ===================================================== */
@@ -109,6 +126,18 @@ define(
           height: 7
         },
         media: healthInstitutionsAllCN,
+        css: uniformCss
+      },
+
+            /* 對照類別 */
+      nonCategory: {
+        name: '生活服務機構',
+        title: {
+          media: { word: '生活服務機構' },
+          css: uniformCss,
+          height: 7
+        },
+        media: nonHealthInstitutionsCN,
         css: uniformCss
       },
 
