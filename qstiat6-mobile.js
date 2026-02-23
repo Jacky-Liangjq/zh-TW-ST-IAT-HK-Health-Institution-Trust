@@ -447,37 +447,37 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			leftAtt1: [{
 				inherit : 'sort', 
 				data : {corResp : 'left'},
-				stimuli : 
-				[
-					{inherit:{type:'exRandom',set:'attribute1'}},
-					{inherit:{set:'error'}}
+				stimuli : [
+				  {inherit:{type:'exRandom',set:'attribute1'}},
+				  {inherit:{set:'error'}},
+				  ...(isTouch ? piCurrent.touchInputStimuli : [])
 				]
 			}],
 			rightAtt2: [{
 				inherit : 'sort', 
 				data : {corResp : 'right'},
-				stimuli : 
-				[
-					{inherit:{type:'exRandom',set:'attribute2'}},
-					{inherit:{set:'error'}}
+				stimuli : [
+				  {inherit:{type:'exRandom',set:'attribute1'}},
+				  {inherit:{set:'error'}},
+				  ...(isTouch ? piCurrent.touchInputStimuli : [])
 				]
 			}],
 			leftCat: [{
 				inherit : 'sort', 
 				data : {corResp : 'left'},
-				stimuli : 
-				[
-					{inherit:{type:'exRandom',set:'category'}},
-					{inherit:{set:'error'}}
+				stimuli : [
+				  {inherit:{type:'exRandom',set:'attribute1'}},
+				  {inherit:{set:'error'}},
+				  ...(isTouch ? piCurrent.touchInputStimuli : [])
 				]
 			}],
 			rightCat: [{
 				inherit : 'sort', 
 				data : {corResp : 'right'},
-				stimuli : 
-				[
-					{inherit:{type:'exRandom',set:'category'}},
-					{inherit:{set:'error'}}
+				stimuli : [
+				  {inherit:{type:'exRandom',set:'attribute1'}},
+				  {inherit:{set:'error'}},
+				  ...(isTouch ? piCurrent.touchInputStimuli : [])
 				]
 			}]	
 		});
@@ -674,7 +674,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 				    data: { handle:'continueTapZone' },
 				    size: {},
 					location: { left: 0, right: 0, top: 0, bottom: 0 },
-				    css: { opacity: 0.25, background: '#00ff00', border: '2px solid #008000', zIndex: 999 },
+				    css: { opacity: 0.05, background: '#00ff00', border: '2px solid #008000', zIndex: 999 },
 				    media: { word: ' ' }
 				  }
 				]
@@ -749,7 +749,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			    data: { handle:'continueTapZone' },
 			    size: {},
 				location: { left: 0, right: 0, top: 0, bottom: 0 },
-			    css: { opacity: 0.25, background: '#00ff00', border: '2px solid #008000', zIndex: 999 },
+			    css: { opacity: 0.05, background: '#00ff00', border: '2px solid #008000', zIndex: 999 },
 			    media: { word: ' ' }
 			  }
 			]
