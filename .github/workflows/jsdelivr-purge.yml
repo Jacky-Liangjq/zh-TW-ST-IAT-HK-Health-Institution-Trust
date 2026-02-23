@@ -3,16 +3,18 @@ name: Purge jsDelivr cache
 on:
   push:
     branches: ["main"]
+    paths:
+      - "HKHealthTrustSTIAT-mobile.js"
+      - "qstiat6-mobile.js"
 
 jobs:
   purge:
     runs-on: ubuntu-latest
     steps:
       - name: Purge jsDelivr cache
+        continue-on-error: true
         uses: egad13/purge-jsdelivr-cache@v1
         with:
           url: |
             https://cdn.jsdelivr.net/gh/Jacky-Liangjq/zh-TW-ST-IAT-HK-Health-Institution-Trust@main/HKHealthTrustSTIAT-mobile.js
             https://cdn.jsdelivr.net/gh/Jacky-Liangjq/zh-TW-ST-IAT-HK-Health-Institution-Trust@main/qstiat6-mobile.js
-            https://cdn.jsdelivr.net/gh/Jacky-Liangjq/zh-TW-ST-IAT-HK-Health-Institution-Trust@main/HKHealthTrustSTIAT.js
-            https://cdn.jsdelivr.net/gh/Jacky-Liangjq/zh-TW-ST-IAT-HK-Health-Institution-Trust@main/qstiat6.js        
