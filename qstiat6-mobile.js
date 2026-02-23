@@ -73,6 +73,27 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			orText : '或',
 			orCss : {'font-size':'1.4em',color:'#000000'},
 
+			leftKeyTextTouch: '點按左側',
+			rightKeyTextTouch: '點按右側',
+
+
+			touchInputStimuli: [
+			  {
+			    data: { handle: 'leftTapZone' },
+			    size: { height: 100, width: 50 },    // height in pixels or grid units; adjust if needed
+			    location: { left: 0, top: 0 },
+			    css: { opacity: 0, zindex: 1 },       // set opacity:0.2 for visible debug
+			    media: { word: ' ' }
+			  },
+			  {
+			    data: { handle: 'rightTapZone' },
+			    size: { height: 100, width: 50 },
+			    location: { right: 0, top: 0 },
+			    css: { opacity: 0, zindex: 1 },       // set opacity:0.2 for visible debug
+			    media: { word: ' ' }
+			  }
+			],
+
 			remindErrorText :
 				'<p style="text-align:center;font-size:1.5em">' +
 				'如果按錯，畫面會顯示紅色 <b style="color:red">X</b>。<br/>' +
