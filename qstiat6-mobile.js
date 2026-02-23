@@ -88,7 +88,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			      opacity: 0.05,
 			      background: '#4da6ff',      // BLUE
 			      border: '3px solid #0066cc',
-			      zIndex: 999
+			      zindex: 999
 			    },
 			    media: { word: ' ' }
 			  },
@@ -100,7 +100,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			      opacity: 0.05,
 			      background: '#ff944d',      // ORANGE
 			      border: '3px solid #cc5200',
-			      zIndex: 999
+			      zindex: 999
 			    },
 			    media: { word: ' ' }
 			  }
@@ -671,7 +671,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 				    data: { handle:'continueTapZone' },
 				    size: {},
 					location: { left: 0, right: 0, top: 0, bottom: 0 },
-				    css: { opacity: 0.05, background: '#00ff00', border: '2px solid #008000', zIndex: 999 },
+				    css: { opacity: 0.05, background: '#00ff00', border: '2px solid #008000', zindex: 999 },
 				    media: { word: ' ' }
 				  }
 				]
@@ -746,7 +746,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			    data: { handle:'continueTapZone' },
 			    size: {},
 				location: { left: 0, right: 0, top: 0, bottom: 0 },
-			    css: { opacity: 0.05, background: '#00ff00', border: '2px solid #008000', zIndex: 999 },
+			    css: { opacity: 0.05, background: '#00ff00', border: '2px solid #008000', zindex: 999 },
 			    media: { word: ' ' }
 			  }
 			]
