@@ -5,11 +5,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 		var API = new APIConstructor();
 		var scorer = new Scorer();
 		var piCurrent = API.getCurrent();
-		var isTouch = !!piCurrent.isTouch;
-		if (isTouch){
-		  piCurrent.leftKeyText = piCurrent.leftKeyTextTouch || piCurrent.leftKeyText;
-		  piCurrent.rightKeyText = piCurrent.rightKeyTextTouch || piCurrent.rightKeyText;
-		}
+
 
 		var stiatObj = 
 		{
@@ -147,6 +143,12 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 
 		_.extend(piCurrent, _.defaults(options, stiatObj));
 
+		var isTouch = !!piCurrent.isTouch;
+		if (isTouch){
+		  piCurrent.leftKeyText = piCurrent.leftKeyTextTouch || piCurrent.leftKeyText;
+		  piCurrent.rightKeyText = piCurrent.rightKeyTextTouch || piCurrent.rightKeyText;
+		}
+
 		API.addSettings('onEnd', window.minnoJS.onEnd);
 
 
@@ -276,6 +278,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			{location:{left:6,top:4+(piCurrent.attribute1.title.height|4)}, media:{word:piCurrent.orText}, css:piCurrent.orCss},
 			{location:{left:6,top:11+(piCurrent.attribute1.title.height|4)},media:piCurrent.category.title.media, css:piCurrent.category.title.css}
 		];
+		if (isTouch) leftLayout = leftLayout.concat(piCurrent.touchInputStimuli);
 		// layout object for the trials where category on right
 		var rightLayout = [
 			{location:{left:6,top:1},media:{word:piCurrent.leftKeyText}, css:piCurrent.keysCss},
@@ -285,6 +288,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			{location:{right:6,top:4+(piCurrent.attribute2.title.height|4)},media:{word:piCurrent.orText}, css:piCurrent.orCss},
 			{location:{right:6,top:11+(piCurrent.attribute2.title.height|4)},media:piCurrent.category.title.media, css:piCurrent.category.title.css}
 		];
+		if (isTouch) rightLayout = rightLayout.concat(piCurrent.touchInputStimuli);
 		// layout object for practice blocks (no category)
 		var pracLayout = [
 			{location:{left:6,top:1},media:{word:piCurrent.leftKeyText}, css:piCurrent.keysCss},
@@ -292,6 +296,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			{location:{left:6,top:4},media:piCurrent.attribute1.title.media, css:piCurrent.attribute1.title.css},
 			{location:{right:6,top:4},media:piCurrent.attribute2.title.media, css:piCurrent.attribute2.title.css}
 		];
+		if (isTouch) pracLayout = pracLayout.concat(piCurrent.touchInputStimuli);
 		
 		var reminderStimulus = 	{location:{bottom:1}, css: {color:piCurrent.fontColor,'font-size':'1em'}, media : {html: piCurrent.remindErrorText}};
 
