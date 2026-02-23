@@ -85,7 +85,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			    size: { width: 50 },
 				location: { left: 0, top: 0, bottom: 0 },
 			    css: {
-			      opacity: 0.35,
+			      opacity: 0.05,
 			      background: '#4da6ff',      // BLUE
 			      border: '3px solid #0066cc',
 			      zIndex: 999
@@ -95,9 +95,9 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			  {
 			    data: { handle: 'rightTapZone' },
 			    size: { width: 50 },
-				location: { left: 0, top: 0, bottom: 0 },
+				location: { right: 0, top: 0, bottom: 0 },
 			    css: {
-			      opacity: 0.35,
+			      opacity: 0.05,
 			      background: '#ff944d',      // ORANGE
 			      border: '3px solid #cc5200',
 			      zIndex: 999
