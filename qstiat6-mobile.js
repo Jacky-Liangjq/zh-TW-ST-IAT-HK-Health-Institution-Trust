@@ -30,6 +30,17 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 				css : {color:'#31b404','font-size':'2em'}
 			},	
 
+			nonCategory : {
+				name : '生活服務機構',
+				title : {
+					media : {word : '生活服務機構'},
+					css : {color:'#31b404','font-size':'2em'},
+					height : 4
+				},
+				media : [],
+				css : {color:'#31b404','font-size':'2em'}
+			},
+
 			attribute1 : {
 				name : '正向',
 				title : {
@@ -276,6 +287,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 		var attribute1 = piCurrent.attribute1.name;
 		var attribute2 = piCurrent.attribute2.name;
 		var category = piCurrent.category.name;
+		var nonCategory = piCurrent.nonCategory && piCurrent.nonCategory.name;
 
 		//This is our block-order condition. We will save it in the explicit table.
 		var block2Condition;
@@ -307,6 +319,14 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			{location:{left:6,top:4},media:piCurrent.attribute1.title.media, css:piCurrent.attribute1.title.css},
 			{location:{right:6,top:4},media:piCurrent.attribute2.title.media, css:piCurrent.attribute2.title.css}
 		];
+
+		var catVsNonCatLayout = [
+			  {location:{left:6,top:1},media:{word:piCurrent.leftKeyText}, css:piCurrent.keysCss},
+			  {location:{right:6,top:1},media:{word:piCurrent.rightKeyText}, css:piCurrent.keysCss},
+			
+			  {location:{left:6,top:4}, media:piCurrent.category.title.media, css:piCurrent.category.title.css},
+			  {location:{right:6,top:4}, media:piCurrent.nonCategory.title.media, css:piCurrent.nonCategory.title.css}
+			];
 
 		// layout for instruction screens (no left/right keys)
 		var instructionLayout = [];
@@ -479,7 +499,25 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 				  {inherit:{set:'error'}},
 				  ...(isTouch ? piCurrent.touchInputStimuli : [])
 				]
-			}]	
+			}],
+			leftNonCat: [{
+				inherit : 'sort',
+				data : {corResp : 'left'},
+				stimuli : [
+				  {inherit:{type:'exRandom',set:'nonCategory'}},
+				  {inherit:{set:'error'}},
+				  ...(isTouch ? piCurrent.touchInputStimuli : [])
+				]
+			}],
+			rightNonCat: [{
+				inherit : 'sort',
+				data : {corResp : 'right'},
+				stimuli : [
+				  {inherit:{type:'exRandom',set:'nonCategory'}},
+				  {inherit:{set:'error'}},
+				  ...(isTouch ? piCurrent.touchInputStimuli : [])
+				]
+			}]
 		});
 
 		/**
@@ -524,7 +562,14 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 				inherit : 'Default', 
 				css:piCurrent.category.css,
 				media : {inherit:{type:'exRandom',set:'category'}}
-			}],			
+			}],
+			nonCategory :
+			[{
+				data: {alias: nonCategory, handle:'targetStim'},
+				inherit : 'Default',
+				css: piCurrent.nonCategory.css,
+				media : {inherit:{type:'exRandom',set:'nonCategory'}}
+			}],
 			// this stimulus used for giving feedback, in this case only the error notification
 			error : [{
 				data:{handle:'error'}, location: {top: 70}, css:{color:'red','font-size':'4em'}, media: {word:'X'}, nolog:true
@@ -540,8 +585,9 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 		 */
 		API.addMediaSets({
 			attribute1 : piCurrent.attribute1.media,
-			attribute2: piCurrent.attribute2.media,
-			category: piCurrent.category.media
+			attribute2 : piCurrent.attribute2.media,
+			category   : piCurrent.category.media,
+			nonCategory: (piCurrent.nonCategory && piCurrent.nonCategory.media) || []
 		});
 
 		/**
@@ -625,12 +671,17 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			//According to the catSide
 			if (isPrac)
 			{
-			  blockLayout = pracLayout;
+			  // Block 1: category vs nonCategory
+			  if (iBlock === 1){
+			    blockLayout = catVsNonCatLayout;
+			  } else {
+			    blockLayout = pracLayout;
+			  }
+			
 			  currentCondition = attribute1 + ',' + attribute2;
 			
-			  // practice should include only attribute trials
-			  singleAttribute = 'leftAtt1';   // attribute1 on left
-			  catAttribute    = 'rightAtt2';  // attribute2 on right
+			  singleAttribute = 'leftAtt1';
+			  catAttribute    = 'rightAtt2';
 			}
 			else if (catSide == 'leftCat')
 			{
@@ -694,6 +745,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			
 			//We separate each block to mini blocks to reduce repetition of categories and responses.
 			for (var iMini = 1; iMini <= piCurrent.trialsByBlock[iBlock-1].miniBlocks; iMini++)
+				var isBlock1 = (iBlock === 1);
 			{//For each mini block
 				var mixer = 
 				{//This mixer will randomize the trials of all the three groups.
@@ -705,7 +757,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 							times : piCurrent.trialsByBlock[iBlock-1].singleAttTrials,
 							data : 
 							[{
-								inherit : singleAttribute, 
+								inherit : (isBlock1 ? 'leftCat' : singleAttribute),
 								data : {condition : currentCondition, block : iBlock}, 
 								layout : blockLayout.concat(reminderStimulus)
 							}]
@@ -715,14 +767,14 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 							times : piCurrent.trialsByBlock[iBlock-1].sharedAttTrials,
 							data : 
 							[{
-								inherit : catAttribute, 
+								inherit : (isBlock1 ? 'rightNonCat' : catAttribute), 
 								data : {condition : currentCondition, block : iBlock}, 
 								layout : blockLayout.concat(reminderStimulus)
 							}]
 						} 
 					]
 				};
-				if (!isPrac) //If it is not a practice block, then
+				if (!isPrac && !isBlock1) //If it is not a practice block, then
 				{//Add the category trials to mixer's data
 					mixer.data.push(
 						{//The key-shared attribute trials
