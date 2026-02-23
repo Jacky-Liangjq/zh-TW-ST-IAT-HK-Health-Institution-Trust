@@ -1,7 +1,7 @@
 define(
   [
     'pipAPI',
-    'https://cdn.jsdelivr.net/gh/Jacky-Liangjq/zh-TW-ST-IAT-HK-Health-Institution-Trust@70ffa569030f8f3514605dedea7d25aed8747aed/qstiat6-mobile.js'
+    'https://cdn.jsdelivr.net/gh/Jacky-Liangjq/zh-TW-ST-IAT-HK-Health-Institution-Trust@74421c5aaa9d48ad2b3b9b579b03559b8a526400/qstiat6-mobile.js'
   ],
   function (APIConstructor, stiatExtension) {
 
