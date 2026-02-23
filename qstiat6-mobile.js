@@ -1,3 +1,4 @@
+console.log("LOADED qstiat6-mobile.js VERSION = 2026-02-23-TEST-A");
 define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) {
 
 	function stiatExtension(options)
