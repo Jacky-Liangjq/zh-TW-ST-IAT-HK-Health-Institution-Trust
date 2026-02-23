@@ -342,8 +342,14 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			interactions: [
 				// begin trial : display stimulus immediately
 				{
-					conditions: [{type:'begin'}],
-					actions: [{type:'showStim',handle:'targetStim'}]
+				  conditions: [{ type:'begin' }],
+				  actions: [
+				    { type:'showStim', handle:'targetStim' },
+				    ...(isTouch ? [
+				      { type:'showStim', handle:'leftTapZone' },
+				      { type:'showStim', handle:'rightTapZone' }
+				    ] : [])
+				  ]
 				},
 
 				// error
