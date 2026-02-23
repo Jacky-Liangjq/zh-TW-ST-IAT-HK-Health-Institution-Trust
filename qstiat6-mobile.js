@@ -286,7 +286,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			{location:{right:6,top:1},media:{word:piCurrent.rightKeyText}, css:piCurrent.keysCss},
 			{location:{left:6,top:4},media:piCurrent.attribute1.title.media, css:piCurrent.attribute1.title.css},
 			{location:{right:6,top:4},media:piCurrent.attribute2.title.media, css:piCurrent.attribute2.title.css},
-			{location:{left:6,top:4+(piCurrent.attribute1.title.height|4)+2}, media:{word:piCurrent.orText}, css:piCurrent.orCss},
+			{location:{left:6,top:4+(piCurrent.attribute1.title.height|4)+3}, media:{word:piCurrent.orText}, css:piCurrent.orCss},
 			{location:{left:6,top:11+(piCurrent.attribute1.title.height|4)},media:piCurrent.category.title.media, css:piCurrent.category.title.css}
 		];
 
@@ -296,7 +296,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			{location:{right:6,top:1},media:{word:piCurrent.rightKeyText}, css:piCurrent.keysCss},
 			{location:{left:6,top:4},media:piCurrent.attribute1.title.media, css:piCurrent.attribute1.title.css},
 			{location:{right:6,top:4},media:piCurrent.attribute2.title.media, css:piCurrent.attribute2.title.css},
-			{location:{right:6,top:4+(piCurrent.attribute2.title.height|4)+2},media:{word:piCurrent.orText}, css:piCurrent.orCss},
+			{location:{right:6,top:4+(piCurrent.attribute2.title.height|4)+3},media:{word:piCurrent.orText}, css:piCurrent.orCss},
 			{location:{right:6,top:11+(piCurrent.attribute2.title.height|4)},media:piCurrent.category.title.media, css:piCurrent.category.title.css}
 		];
 
@@ -487,9 +487,18 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 		 */
 		API.addStimulusSets({
 			// This Default stimulus is inherited by the other stimuli so that we can have a consistent look and change it from one place
-			Default: [
-				{css:{color:'white','font-size':'2em'}}
-			],
+		Default: [
+		  {
+		    css:{
+		      color:'#000000',
+		      'font-size':'3em',
+		      background:'#ffffff',
+		      padding:'0.4em 0.8em',
+		      'border-radius':'8px',
+		      display:'inline-block'
+		    }
+		  }
+		],
 
 			instructions: [
 				{css:{'font-size':'1.4em',color:'black', lineHeight:1.2}, nolog:true, location:{bottom:1}}
