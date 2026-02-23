@@ -289,7 +289,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			{location:{left:6,top:4+(piCurrent.attribute1.title.height|4)}, media:{word:piCurrent.orText}, css:piCurrent.orCss},
 			{location:{left:6,top:11+(piCurrent.attribute1.title.height|4)},media:piCurrent.category.title.media, css:piCurrent.category.title.css}
 		];
-		if (isTouch) leftLayout = leftLayout.concat(piCurrent.touchInputStimuli);
+
 		// layout object for the trials where category on right
 		var rightLayout = [
 			{location:{left:6,top:1},media:{word:piCurrent.leftKeyText}, css:piCurrent.keysCss},
@@ -299,7 +299,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			{location:{right:6,top:4+(piCurrent.attribute2.title.height|4)},media:{word:piCurrent.orText}, css:piCurrent.orCss},
 			{location:{right:6,top:11+(piCurrent.attribute2.title.height|4)},media:piCurrent.category.title.media, css:piCurrent.category.title.css}
 		];
-		if (isTouch) rightLayout = rightLayout.concat(piCurrent.touchInputStimuli);
+
 		// layout object for practice blocks (no category)
 		var pracLayout = [
 			{location:{left:6,top:1},media:{word:piCurrent.leftKeyText}, css:piCurrent.keysCss},
@@ -307,7 +307,10 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			{location:{left:6,top:4},media:piCurrent.attribute1.title.media, css:piCurrent.attribute1.title.css},
 			{location:{right:6,top:4},media:piCurrent.attribute2.title.media, css:piCurrent.attribute2.title.css}
 		];
-		if (isTouch) pracLayout = pracLayout.concat(piCurrent.touchInputStimuli);
+
+		// layout for instruction screens (no left/right keys)
+		var instructionLayout = [];
+
 		
 		var reminderStimulus = 	{location:{bottom:1}, css: {color:piCurrent.fontColor,'font-size':'1em'}, media : {html: piCurrent.remindErrorText}};
 
@@ -621,6 +624,9 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 				catAttribute = 'rightAtt2';
 				currentCondition = attribute1 + ',' + attribute2 + '/' + category;
 			}
+			if (isTouch && !isPrac) {
+			  blockLayout = blockLayout.concat(piCurrent.touchInputStimuli);
+			}
 
 			if (iBlock === 2)
 			{//Set the block2Condition variable. That is our block order condition.
@@ -647,7 +653,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			  {
 			    inherit : 'instructions', 
 			    data: {blockStart:true},
-			    layout : blockLayout, 
+			    layout : instructionLayout,
 				stimuli : [
 				  { 
 				    inherit : 'instructions', 
@@ -660,8 +666,8 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 				  },
 				  {
 				    data: { handle:'continueTapZone' },
-				    size: { height: 25, width: 100 },
-				    location: { left: 0, bottom: 0 },
+				    size: {},
+					location: { left: 0, right: 0, top: 0, bottom: 0 },
 				    css: { opacity: 0.25, background: '#00ff00', border: '2px solid #008000', zIndex: 999 },
 				    media: { word: ' ' }
 				  }
@@ -684,7 +690,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 							[{
 								inherit : singleAttribute, 
 								data : {condition : currentCondition, block : iBlock}, 
-								layout : blockLayout.concat(reminderStimulus).concat(piCurrent.touchInputStimuli)
+								layout : blockLayout.concat(reminderStimulus)
 							}]
 						}, 
 						{//The key-shared attribute trials
@@ -694,7 +700,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 							[{
 								inherit : catAttribute, 
 								data : {condition : currentCondition, block : iBlock}, 
-								layout : blockLayout.concat(reminderStimulus).concat(piCurrent.touchInputStimuli)
+								layout : blockLayout.concat(reminderStimulus)
 							}]
 						} 
 					]
@@ -709,7 +715,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 							[{
 								inherit : catSide, 
 								data : {condition : currentCondition, block : iBlock}, 
-								layout : blockLayout.concat(reminderStimulus).concat(piCurrent.touchInputStimuli)
+								layout : blockLayout.concat(reminderStimulus)
 							}]
 						}
 					);
@@ -735,8 +741,8 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			  },
 			  {
 			    data: { handle:'continueTapZone' },
-			    size: { height: 25, width: 100 },
-			    location: { left: 0, bottom: 0 },
+			    size: {},
+				location: { left: 0, right: 0, top: 0, bottom: 0 },
 			    css: { opacity: 0.25, background: '#00ff00', border: '2px solid #008000', zIndex: 999 },
 			    media: { word: ' ' }
 			  }
