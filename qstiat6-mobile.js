@@ -582,6 +582,9 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 		}
 		
 		var catSide = '';
+		var singleAttribute;
+		var catAttribute;
+		
 		for (var iBlock = 1; iBlock <= piCurrent.trialsByBlock.length; iBlock++)
 		{//For each block
 
@@ -735,7 +738,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			stimuli : [
 			  { 
 			    inherit : 'instructions', 
-			    media : {html : instHTML}
+			    media : {html : piCurrent.finalText}
 			  },
 			  {
 			    data : {handle:'dummy', alias:'dummy'},
