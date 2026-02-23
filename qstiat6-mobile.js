@@ -646,7 +646,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			        data: { handle:'continueTapZone' },
 			        size: { height: 25, width: 100 },
 			        location: { left: 0, bottom: 0 },
-			        css: { opacity: 0.15, zindex: 2 },
+			        css: { opacity: 0.9, zindex: 2 },
 			        media: { word: ' ' }
 			      }
 			    ]
