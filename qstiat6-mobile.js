@@ -386,32 +386,32 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 				data: {blockStart:true, block:0, condition:'inst', score:0},
 
 				// create user interface (just click to move on...)
-				input: [
-					{handle:'space',on:'space'}
-				],
-
-				interactions: [
-					// display instructions
-					{
-						conditions: [{type:'begin'}],
-						actions: [
-							{type:'showStim',handle:'All'}
-						]
-					},
-					// space hit, end trial soon
-					{
-						conditions: [{type:'inputEquals',value:'space'}],
-						actions: [
-							{type:'hideStim', handle:'All'},
-							{type:'log'},
-							{type:'trigger', handle:'endTrial', duration:500}
-						]
-					},
-					{
-						conditions: [{type:'inputEquals',value:'endTrial'}],
-						actions: [{type:'endTrial'}]
-					}
-				]
+			input: [
+			  { handle:'continue', on:'click', stimHandle:'continueTapZone' }
+			],
+			
+			interactions: [
+			  // display instructions
+			  {
+			    conditions: [{ type:'begin' }],
+			    actions: [
+			      { type:'showStim', handle:'All' }
+			    ]
+			  },
+			  // tap to continue, end trial soon
+			  {
+			    conditions: [{ type:'inputEquals', value:'continue' }],
+			    actions: [
+			      { type:'hideStim', handle:'All' },
+			      { type:'log' },
+			      { type:'trigger', handle:'endTrial', duration:500 }
+			    ]
+			  },
+			  {
+			    conditions: [{ type:'inputEquals', value:'endTrial' }],
+			    actions: [{ type:'endTrial' }]
+			  }
+			]
 			}
 		]);
 
