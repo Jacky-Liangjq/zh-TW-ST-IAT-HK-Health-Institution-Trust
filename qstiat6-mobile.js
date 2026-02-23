@@ -616,8 +616,12 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			//According to the catSide
 			if (isPrac)
 			{
-				blockLayout = pracLayout;
-				currentCondition = attribute1 + ',' + attribute2;
+			  blockLayout = pracLayout;
+			  currentCondition = attribute1 + ',' + attribute2;
+			
+			  // practice should include only attribute trials
+			  singleAttribute = 'leftAtt1';   // attribute1 on left
+			  catAttribute    = 'rightAtt2';  // attribute2 on right
 			}
 			else if (catSide == 'leftCat')
 			{
@@ -633,9 +637,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 				catAttribute = 'rightAtt2';
 				currentCondition = attribute1 + ',' + attribute2 + '/' + category;
 			}
-			if (isTouch && !isPrac) {
-			  blockLayout = blockLayout.concat(piCurrent.touchInputStimuli);
-			}
+
 
 			if (iBlock === 2)
 			{//Set the block2Condition variable. That is our block order condition.
