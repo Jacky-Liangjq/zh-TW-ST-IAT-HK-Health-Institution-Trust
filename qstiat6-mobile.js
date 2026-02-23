@@ -457,7 +457,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 				inherit : 'sort', 
 				data : {corResp : 'right'},
 				stimuli : [
-				  {inherit:{type:'exRandom',set:'attribute1'}},
+				  {inherit:{type:'exRandom',set:'attribute2'}},
 				  {inherit:{set:'error'}},
 				  ...(isTouch ? piCurrent.touchInputStimuli : [])
 				]
@@ -466,7 +466,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 				inherit : 'sort', 
 				data : {corResp : 'left'},
 				stimuli : [
-				  {inherit:{type:'exRandom',set:'attribute1'}},
+				  {inherit:{type:'exRandom',set:'category'}},
 				  {inherit:{set:'error'}},
 				  ...(isTouch ? piCurrent.touchInputStimuli : [])
 				]
@@ -475,7 +475,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 				inherit : 'sort', 
 				data : {corResp : 'right'},
 				stimuli : [
-				  {inherit:{type:'exRandom',set:'attribute1'}},
+				  {inherit:{type:'exRandom',set:'category'}},
 				  {inherit:{set:'error'}},
 				  ...(isTouch ? piCurrent.touchInputStimuli : [])
 				]
