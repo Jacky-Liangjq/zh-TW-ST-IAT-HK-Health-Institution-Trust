@@ -87,14 +87,14 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			    data: { handle: 'leftTapZone' },
 			    size: { height: 100, width: 50 },    // height in pixels or grid units; adjust if needed
 			    location: { left: 0, top: 0 },
-			    css: { opacity: 0, zindex: 1 },       // set opacity:0.2 for visible debug
+			    css: { opacity: 0.15, zindex: 1 },       // set opacity:0.2 for visible debug
 			    media: { word: ' ' }
 			  },
 			  {
 			    data: { handle: 'rightTapZone' },
 			    size: { height: 100, width: 50 },
 			    location: { right: 0, top: 0 },
-			    css: { opacity: 0, zindex: 1 },       // set opacity:0.2 for visible debug
+			    css: { opacity: 0.15, zindex: 1 },       // set opacity:0.2 for visible debug
 			    media: { word: ' ' }
 			  }
 			],
@@ -628,22 +628,29 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			}
 			//Add the block's instructions sequence
 			trialSequence.push(
-				{
-					inherit : 'instructions', 
-					data: {blockStart:true},
-					layout : blockLayout, 
-					stimuli : [
-						{ 
-							inherit : 'instructions', 
-							media : {html : instHTML}
-						},
-						{
-							data : {handle:'dummy', alias:'dummy'},
-							media : {word:' '}, 
-							location : {top:1}
-						}
-					]
-				}
+			  {
+			    inherit : 'instructions', 
+			    data: {blockStart:true},
+			    layout : blockLayout, 
+			    stimuli : [
+			      { 
+			        inherit : 'instructions', 
+			        media : {html : instHTML}
+			      },
+			      {
+			        data : {handle:'dummy', alias:'dummy'},
+			        media : {word:' '}, 
+			        location : {top:1}
+			      },
+			      {
+			        data: { handle:'continueTapZone' },
+			        size: { height: 25, width: 100 },
+			        location: { left: 0, bottom: 0 },
+			        css: { opacity: 0.15, zindex: 2 },
+			        media: { word: ' ' }
+			      }
+			    ]
+			  }
 			);
 			
 			//We separate each block to mini blocks to reduce repetition of categories and responses.
@@ -695,23 +702,31 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			}
 		}
 		//Add the final goodbye trial.
+		//Add the final goodbye trial.
 		trialSequence.push({
-			inherit : 'instructions', 
-			data: {blockStart:true},
-			layout : [{media:{word:''}}], 
-			stimuli : [
-				{ 
-					inherit : 'instructions', 
-					css : {color:piCurrent.fontColor}, 
-					media:{html:'<div><p style="font-size:28px"><color="#000000">' + 
-					piCurrent.finalText + '</p></div>'}
-				},
-				{
-					data : {handle:'dummy', alias:'dummy'},
-					media : {word:' '}, 
-					location : {top:1}
-				}			
-			]
+		  inherit : 'instructions', 
+		  data: {blockStart:true},
+		  layout : [{media:{word:''}}], 
+		  stimuli : [
+		    { 
+		      inherit : 'instructions', 
+		      css : {color:piCurrent.fontColor}, 
+		      media:{html:'<div><p style="font-size:28px"><color="#000000">' + 
+		      piCurrent.finalText + '</p></div>'}
+		    },
+		    {
+		      data : {handle:'dummy', alias:'dummy'},
+		      media : {word:' '}, 
+		      location : {top:1}
+		    },
+		    {
+		      data: { handle:'continueTapZone' },
+		      size: { height: 25, width: 100 },
+		      location: { left: 0, bottom: 0 },
+		      css: { opacity: 0.15, zindex: 2 },
+		      media: { word: ' ' }
+		    }
+		  ]
 		});
 		//Now add the trials sequence to the API.
 		API.addSequence(trialSequence);
