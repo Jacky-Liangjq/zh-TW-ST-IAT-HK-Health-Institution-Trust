@@ -327,6 +327,43 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			  {location:{left:6,top:4}, media:piCurrent.category.title.media, css:piCurrent.category.title.css},
 			  {location:{right:6,top:4}, media:piCurrent.nonCategory.title.media, css:piCurrent.nonCategory.title.css}
 			];
+		var attOnlyLayout = [
+			  {location:{left:6,top:1},media:{word:piCurrent.leftKeyText}, css:piCurrent.keysCss},
+			  {location:{right:6,top:1},media:{word:piCurrent.rightKeyText}, css:piCurrent.keysCss},
+			  {location:{left:6,top:4},media:piCurrent.attribute1.title.media, css:piCurrent.attribute1.title.css},
+			  {location:{right:6,top:4},media:piCurrent.attribute2.title.media, css:piCurrent.attribute2.title.css}
+			];
+		// Block3: positive association (category + att1) vs (nonCategory + att2)
+		var comboLayout_pos = [
+		  {location:{left:6,top:1},  media:{word:piCurrent.leftKeyText},  css:piCurrent.keysCss},
+		  {location:{right:6,top:1}, media:{word:piCurrent.rightKeyText}, css:piCurrent.keysCss},
+		
+		  // LEFT: attribute1 + category
+		  {location:{left:6,top:4}, media:piCurrent.attribute1.title.media, css:piCurrent.attribute1.title.css},
+		  {location:{left:6,top:4+(piCurrent.attribute1.title.height|4)+4}, media:{word:piCurrent.orText}, css:piCurrent.orCss},
+		  {location:{left:6,top:11+(piCurrent.attribute1.title.height|4)}, media:piCurrent.category.title.media, css:piCurrent.category.title.css},
+		
+		  // RIGHT: attribute2 + nonCategory
+		  {location:{right:6,top:4}, media:piCurrent.attribute2.title.media, css:piCurrent.attribute2.title.css},
+		  {location:{right:6,top:4+(piCurrent.attribute2.title.height|4)+4}, media:{word:piCurrent.orText}, css:piCurrent.orCss},
+		  {location:{right:6,top:11+(piCurrent.attribute2.title.height|4)}, media:piCurrent.nonCategory.title.media, css:piCurrent.nonCategory.title.css}
+		];
+		
+		// Block4: negative association (category + att2) vs (nonCategory + att1)
+		var comboLayout_neg = [
+		  {location:{left:6,top:1},  media:{word:piCurrent.leftKeyText},  css:piCurrent.keysCss},
+		  {location:{right:6,top:1}, media:{word:piCurrent.rightKeyText}, css:piCurrent.keysCss},
+		
+		  // LEFT: attribute2 + category
+		  {location:{left:6,top:4}, media:piCurrent.attribute2.title.media, css:piCurrent.attribute2.title.css},
+		  {location:{left:6,top:4+(piCurrent.attribute2.title.height|4)+4}, media:{word:piCurrent.orText}, css:piCurrent.orCss},
+		  {location:{left:6,top:11+(piCurrent.attribute2.title.height|4)}, media:piCurrent.category.title.media, css:piCurrent.category.title.css},
+		
+		  // RIGHT: attribute1 + nonCategory
+		  {location:{right:6,top:4}, media:piCurrent.attribute1.title.media, css:piCurrent.attribute1.title.css},
+		  {location:{right:6,top:4+(piCurrent.attribute1.title.height|4)+4}, media:{word:piCurrent.orText}, css:piCurrent.orCss},
+		  {location:{right:6,top:11+(piCurrent.attribute1.title.height|4)}, media:piCurrent.nonCategory.title.media, css:piCurrent.nonCategory.title.css}
+		];
 
 		// layout for instruction screens (no left/right keys)
 		var instructionLayout = [];
@@ -517,6 +554,45 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 				  {inherit:{set:'error'}},
 				  ...(isTouch ? piCurrent.touchInputStimuli : [])
 				]
+			}],
+			// ===== Block1: category vs nonCategory (pure) =====
+			leftCat_only: [{
+			  inherit : 'sort',
+			  data : {corResp : 'left'},
+			  stimuli : [
+			    {inherit:{type:'exRandom',set:'category'}},
+			    {inherit:{set:'error'}},
+			    ...(isTouch ? piCurrent.touchInputStimuli : [])
+			  ]
+			}],
+			rightNonCat_only: [{
+			  inherit : 'sort',
+			  data : {corResp : 'right'},
+			  stimuli : [
+			    {inherit:{type:'exRandom',set:'nonCategory'}},
+			    {inherit:{set:'error'}},
+			    ...(isTouch ? piCurrent.touchInputStimuli : [])
+			  ]
+			}],
+			
+			// ===== Block2: attribute1 vs attribute2 (pure) =====
+			leftAtt1_only: [{
+			  inherit : 'sort',
+			  data : {corResp : 'left'},
+			  stimuli : [
+			    {inherit:{type:'exRandom',set:'attribute1'}},
+			    {inherit:{set:'error'}},
+			    ...(isTouch ? piCurrent.touchInputStimuli : [])
+			  ]
+			}],
+			rightAtt2_only: [{
+			  inherit : 'sort',
+			  data : {corResp : 'right'},
+			  stimuli : [
+			    {inherit:{type:'exRandom',set:'attribute2'}},
+			    {inherit:{set:'error'}},
+			    ...(isTouch ? piCurrent.touchInputStimuli : [])
+			  ]
 			}]
 		});
 
