@@ -333,8 +333,8 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			  {location:{left:6,top:4},media:piCurrent.attribute1.title.media, css:piCurrent.attribute1.title.css},
 			  {location:{right:6,top:4},media:piCurrent.attribute2.title.media, css:piCurrent.attribute2.title.css}
 			];
-		// Block3: positive association (category + att1) vs (nonCategory + att2)
-		var comboLayout_pos = [
+		// Block3: 正面聯想（健康機構 + 正面）在左；右側只有「負面」
+		var comboLayout_pos_catLeft = [
 		  {location:{left:6,top:1},  media:{word:piCurrent.leftKeyText},  css:piCurrent.keysCss},
 		  {location:{right:6,top:1}, media:{word:piCurrent.rightKeyText}, css:piCurrent.keysCss},
 		
@@ -343,26 +343,22 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 		  {location:{left:6,top:4+(piCurrent.attribute1.title.height|4)+4}, media:{word:piCurrent.orText}, css:piCurrent.orCss},
 		  {location:{left:6,top:11+(piCurrent.attribute1.title.height|4)}, media:piCurrent.category.title.media, css:piCurrent.category.title.css},
 		
-		  // RIGHT: attribute2 + nonCategory
-		  {location:{right:6,top:4}, media:piCurrent.attribute2.title.media, css:piCurrent.attribute2.title.css},
-		  {location:{right:6,top:4+(piCurrent.attribute2.title.height|4)+4}, media:{word:piCurrent.orText}, css:piCurrent.orCss},
-		  {location:{right:6,top:11+(piCurrent.attribute2.title.height|4)}, media:piCurrent.nonCategory.title.media, css:piCurrent.nonCategory.title.css}
+		  // RIGHT: attribute2 only
+		  {location:{right:6,top:4}, media:piCurrent.attribute2.title.media, css:piCurrent.attribute2.title.css}
 		];
 		
-		// Block4: negative association (category + att2) vs (nonCategory + att1)
-		var comboLayout_neg = [
+		// Block4: 負面聯想（健康機構 + 負面）在右；左側只有「正面」
+		var comboLayout_neg_catRight = [
 		  {location:{left:6,top:1},  media:{word:piCurrent.leftKeyText},  css:piCurrent.keysCss},
 		  {location:{right:6,top:1}, media:{word:piCurrent.rightKeyText}, css:piCurrent.keysCss},
 		
-		  // LEFT: attribute2 + category
-		  {location:{left:6,top:4}, media:piCurrent.attribute2.title.media, css:piCurrent.attribute2.title.css},
-		  {location:{left:6,top:4+(piCurrent.attribute2.title.height|4)+4}, media:{word:piCurrent.orText}, css:piCurrent.orCss},
-		  {location:{left:6,top:11+(piCurrent.attribute2.title.height|4)}, media:piCurrent.category.title.media, css:piCurrent.category.title.css},
+		  // LEFT: attribute1 only
+		  {location:{left:6,top:4}, media:piCurrent.attribute1.title.media, css:piCurrent.attribute1.title.css},
 		
-		  // RIGHT: attribute1 + nonCategory
-		  {location:{right:6,top:4}, media:piCurrent.attribute1.title.media, css:piCurrent.attribute1.title.css},
-		  {location:{right:6,top:4+(piCurrent.attribute1.title.height|4)+4}, media:{word:piCurrent.orText}, css:piCurrent.orCss},
-		  {location:{right:6,top:11+(piCurrent.attribute1.title.height|4)}, media:piCurrent.nonCategory.title.media, css:piCurrent.nonCategory.title.css}
+		  // RIGHT: attribute2 + category
+		  {location:{right:6,top:4}, media:piCurrent.attribute2.title.media, css:piCurrent.attribute2.title.css},
+		  {location:{right:6,top:4+(piCurrent.attribute2.title.height|4)+4}, media:{word:piCurrent.orText}, css:piCurrent.orCss},
+		  {location:{right:6,top:11+(piCurrent.attribute2.title.height|4)}, media:piCurrent.category.title.media, css:piCurrent.category.title.css}
 		];
 
 		// layout for instruction screens (no left/right keys)
@@ -736,15 +732,15 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 		  blockLayout = attOnlyLayout;
 		  currentCondition = attribute1 + ',' + attribute2;
 		}
-		// Block 3: 正面聯想（左：可信 或 健康機構；右：不可信 或 生活服務機構）
+		// Block 3: 正面聯想（category + att1）vs（att2）
 		else if (iBlock === 3){
-		  blockLayout = comboLayout_pos;
-		  currentCondition = attribute1 + '/' + category + ',' + attribute2 + '/' + nonCategory;
+		  blockLayout = comboLayout_pos_catLeft;
+		  currentCondition = category + '/' + attribute1 + ',' + attribute2;
 		}
-		// Block 4: 負面聯想（左：可信 或 生活服務機構；右：不可信 或 健康機構）
+		// Block 4: 負面聯想（att1）vs（category + att2）
 		else if (iBlock === 4){
-		  blockLayout = comboLayout_neg;
-		  currentCondition = attribute1 + '/' + nonCategory + ',' + attribute2 + '/' + category;
+		  blockLayout = comboLayout_neg_catRight;
+		  currentCondition = attribute1 + ',' + category + '/' + attribute2;
 		}
 
 
@@ -834,24 +830,24 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			
 				// Block 1/2 不需要第三組
 				if (iBlock===3){
-				  // Block3 需要把 category / nonCategory 混进来
+				  // Block3：category 一律在左（與 attribute1 同側）
 				  mixer.data.push({
 				    mixer : 'repeat',
 				    times : piCurrent.trialsByBlock[iBlock-1].categoryTrials,
 				    data : [{
-				      inherit : (Math.random()<0.5 ? 'leftCat' : 'rightNonCat'),
+				      inherit : 'leftCat',
 				      data : {condition : currentCondition, block : iBlock},
 				      layout : blockLayout.concat(reminderStimulus)
 				    }]
 				  });
 				}
 				else if (iBlock===4){
-				  // Block4 需要把 category / nonCategory 混进来（但 mapping 反过来）
+				  // Block4：category 一律在右（與 attribute2 同側）
 				  mixer.data.push({
 				    mixer : 'repeat',
 				    times : piCurrent.trialsByBlock[iBlock-1].categoryTrials,
 				    data : [{
-				      inherit : (Math.random()<0.5 ? 'leftNonCat' : 'rightCat'),
+				      inherit : 'rightCat',
 				      data : {condition : currentCondition, block : iBlock},
 				      layout : blockLayout.concat(reminderStimulus)
 				    }]
@@ -897,16 +893,8 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 		scorer.addSettings('compute',{
 			ErrorVar:'score',
 			condVar:'condition',
-			//condition 1
-			cond1VarValues: [
-				category + '/' + attribute1 + ',' + attribute2
-				//attribute1 + ',' + attribute2 + '/' + category
-			],
-			//condition 2
-			cond2VarValues: [ 
-				attribute1 + ',' + attribute2 + '/' + category
-				//attribute1 + '/' + category + ',' + attribute2
-			],
+			cond1VarValues: [ category + '/' + attribute1 + ',' + attribute2 ],      // Block3
+			cond2VarValues: [ attribute1 + ',' + category + '/' + attribute2 ],      // Block4
 			parcelVar : "parcel", //We use only one parcel because it is probably not less reliable.
 			parcelValue : ['first'],
 			fastRT : 150, //Below this reaction time, the latency is considered extremely fast.
