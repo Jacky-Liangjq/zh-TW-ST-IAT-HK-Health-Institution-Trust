@@ -109,13 +109,19 @@ define(
     return stiatExtension({
 
       /* block 說明頁（全中文） */
-      trialsByBlock: [
-        { instHTML: instHTML, block: 1, miniBlocks: 2, singleAttTrials: 15, sharedAttTrials: 15, categoryTrials: 0 },
-        { instHTML: instHTML, block: 2, miniBlocks: 2, singleAttTrials: 10, sharedAttTrials: 10,  categoryTrials: 5 },
-        { instHTML: instHTML, block: 3, miniBlocks: 2, singleAttTrials: 10,  sharedAttTrials: 10, categoryTrials: 5 },
-        { instHTML: instHTML, block: 4, miniBlocks: 2, singleAttTrials: 10, sharedAttTrials: 10,  categoryTrials: 5 },
-        { instHTML: instHTML, block: 5, miniBlocks: 2, singleAttTrials: 10,  sharedAttTrials: 10, categoryTrials: 5 }
-      ],
+    trialsByBlock: [
+      // 1) 健康機構 vs 生活服務機構
+      { instHTML: instHTML, block: 1, miniBlocks: 2, singleAttTrials: 13, sharedAttTrials: 0, categoryTrials: 12 },
+    
+      // 2) 可信 vs 不可信
+      { instHTML: instHTML, block: 2, miniBlocks: 2, singleAttTrials: 13, sharedAttTrials: 0, categoryTrials: 12 },
+    
+      // 3) 正面聯想（聯合）
+      { instHTML: instHTML, block: 3, miniBlocks: 2, singleAttTrials: 9, sharedAttTrials: 9, categoryTrials: 7 },
+    
+      // 4) 負面聯想（聯合）
+      { instHTML: instHTML, block: 4, miniBlocks: 2, singleAttTrials: 9, sharedAttTrials: 9, categoryTrials: 7 }
+    ],
 
       /* 目標類別 */
       category: {
