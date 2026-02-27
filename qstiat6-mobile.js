@@ -719,60 +719,33 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 		for (var iBlock = 1; iBlock <= piCurrent.trialsByBlock.length; iBlock++)
 		{//For each block
 
-			var isPrac = false;
-			var currentCondition = '';
-			var blockLayout;
-			if (piCurrent.trialsByBlock[iBlock-1].categoryTrials === 0)
-			{//There are no category trials, so this is a practice block because.
-				isPrac = true;
-			}
-			else if (catSide != 'rightCat' && catSide != 'leftCat' )
-			{//This is not practice, and we should not switch sides, but the category side has has never been set.
-				catSide = firstCatSide;
-			}
-			else if (piCurrent.switchSideBlock == iBlock  //Switch category once, on this block
-			|| piCurrent.switchSideBlock <= 0 //Switch layout every block
-			)
-			{//Switch layout
-				if (catSide == 'rightCat')
-				{
-					catSide = 'leftCat';
-				}
-				else if (catSide == 'leftCat')
-				{
-					catSide = 'rightCat';
-				}
-			}
-
-			//According to the catSide
-			if (isPrac)
-			{
-			  // Block 1: category vs nonCategory
-			  if (iBlock === 1){
-			    blockLayout = catVsNonCatLayout;
-			  } else {
-			    blockLayout = pracLayout;
-			  }
-			
-			  currentCondition = attribute1 + ',' + attribute2;
-			
-			  singleAttribute = 'leftAtt1';
-			  catAttribute    = 'rightAtt2';
-			}
-			else if (catSide == 'leftCat')
-			{
-				blockLayout =  leftLayout;
-				singleAttribute = 'rightAtt2';
-				catAttribute = 'leftAtt1';
-				currentCondition = category + '/' + attribute1 + ',' + attribute2;
-			}
-			else if (catSide == 'rightCat')
-			{
-				blockLayout =  rightLayout;
-				singleAttribute = 'leftAtt1';
-				catAttribute = 'rightAtt2';
-				currentCondition = attribute1 + ',' + attribute2 + '/' + category;
-			}
+		var currentCondition = '';
+		var blockLayout;
+		
+		// 固定：attribute1 永远左，attribute2 永远右（你要的）
+		var attLeft  = 'leftAtt1';
+		var attRight = 'rightAtt2';
+		
+		// Block 1: category vs nonCategory（健康機構 vs 生活服務機構）
+		if (iBlock === 1){
+		  blockLayout = catVsNonCatLayout;
+		  currentCondition = category + ',' + nonCategory; // 只是記錄用
+		}
+		// Block 2: attribute only（可信 vs 不可信）
+		else if (iBlock === 2){
+		  blockLayout = attOnlyLayout;
+		  currentCondition = attribute1 + ',' + attribute2;
+		}
+		// Block 3: 正面聯想（左：可信 或 健康機構；右：不可信 或 生活服務機構）
+		else if (iBlock === 3){
+		  blockLayout = comboLayout_pos;
+		  currentCondition = attribute1 + '/' + category + ',' + attribute2 + '/' + nonCategory;
+		}
+		// Block 4: 負面聯想（左：可信 或 生活服務機構；右：不可信 或 健康機構）
+		else if (iBlock === 4){
+		  blockLayout = comboLayout_neg;
+		  currentCondition = attribute1 + '/' + nonCategory + ',' + attribute2 + '/' + category;
+		}
 
 
 			if (iBlock === 2)
@@ -820,52 +793,72 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			);
 			
 			//We separate each block to mini blocks to reduce repetition of categories and responses.
+			//We separate each block to mini blocks to reduce repetition of categories and responses.
+			var isBlock1 = (iBlock === 1);
+			
 			for (var iMini = 1; iMini <= piCurrent.trialsByBlock[iBlock-1].miniBlocks; iMini++)
-				var isBlock1 = (iBlock === 1);
 			{//For each mini block
-				var mixer = 
-				{//This mixer will randomize the trials of all the three groups.
-					mixer : 'random', 
-					data : 
-					[
-						{//The single attribute trials
-							mixer : 'repeat', 
-							times : piCurrent.trialsByBlock[iBlock-1].singleAttTrials,
-							data : 
-							[{
-								inherit : (isBlock1 ? 'leftCat' : singleAttribute),
-								data : {condition : currentCondition, block : iBlock}, 
-								layout : blockLayout.concat(reminderStimulus)
-							}]
-						}, 
-						{//The key-shared attribute trials
-							mixer : 'repeat', 
-							times : piCurrent.trialsByBlock[iBlock-1].sharedAttTrials,
-							data : 
-							[{
-								inherit : (isBlock1 ? 'rightNonCat' : catAttribute), 
-								data : {condition : currentCondition, block : iBlock}, 
-								layout : blockLayout.concat(reminderStimulus)
-							}]
-						} 
-					]
-				};
-				if (!isPrac && !isBlock1) //If it is not a practice block, then
-				{//Add the category trials to mixer's data
-					mixer.data.push(
-						{//The key-shared attribute trials
-							mixer : 'repeat', 
-							times : piCurrent.trialsByBlock[iBlock-1].categoryTrials,
-							data : 
-							[{
-								inherit : catSide, 
-								data : {condition : currentCondition, block : iBlock}, 
-								layout : blockLayout.concat(reminderStimulus)
-							}]
-						}
-					);
+			    var mixer =
+			    {//This mixer will randomize the trials of all the three groups.
+			        mixer : 'random',
+			        data :
+			        [
+			            {//The single attribute trials
+			                mixer : 'repeat',
+			                times : piCurrent.trialsByBlock[iBlock-1].singleAttTrials,
+			                data :
+			                [{
+			                    inherit : (iBlock===1 ? 'leftCat' :
+						          iBlock===2 ? attLeft :
+						          iBlock===3 ? attLeft :
+						          iBlock===4 ? 'leftNonCat' : attLeft),
+			                    data : {condition : currentCondition, block : iBlock},
+			                    layout : blockLayout.concat(reminderStimulus)
+			                }]
+			            },
+			            {//The key-shared attribute trials
+			                mixer : 'repeat',
+			                times : piCurrent.trialsByBlock[iBlock-1].sharedAttTrials,
+			                data :
+			                [{
+			                    inherit : (iBlock===1 ? 'rightNonCat' :
+						          iBlock===2 ? attRight :
+						          iBlock===3 ? attRight :
+						          iBlock===4 ? 'rightCat' : attRight),
+			                    data : {condition : currentCondition, block : iBlock},
+			                    layout : blockLayout.concat(reminderStimulus)
+			                }]
+			            }
+			        ]
+			    };
+			
+				// Block 1/2 不需要第三組
+				if (iBlock===3){
+				  // Block3 需要把 category / nonCategory 混进来
+				  mixer.data.push({
+				    mixer : 'repeat',
+				    times : piCurrent.trialsByBlock[iBlock-1].categoryTrials,
+				    data : [{
+				      inherit : (Math.random()<0.5 ? 'leftCat' : 'rightNonCat'),
+				      data : {condition : currentCondition, block : iBlock},
+				      layout : blockLayout.concat(reminderStimulus)
+				    }]
+				  });
 				}
-				trialSequence.push(mixer);
+				else if (iBlock===4){
+				  // Block4 需要把 category / nonCategory 混进来（但 mapping 反过来）
+				  mixer.data.push({
+				    mixer : 'repeat',
+				    times : piCurrent.trialsByBlock[iBlock-1].categoryTrials,
+				    data : [{
+				      inherit : (Math.random()<0.5 ? 'leftNonCat' : 'rightCat'),
+				      data : {condition : currentCondition, block : iBlock},
+				      layout : blockLayout.concat(reminderStimulus)
+				    }]
+				  });
+				}
+			
+			    trialSequence.push(mixer);
 			}
 		}
 		//Add the final goodbye trial.
