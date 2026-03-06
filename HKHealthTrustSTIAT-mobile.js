@@ -123,7 +123,7 @@ define(
       // Block4: 負面聯想
       { instHTML: instHTML, block:4, miniBlocks:1, singleAttTrials:9, sharedAttTrials:9, categoryTrials:7 }
     
-    ]
+    ],
 
       /* 目標類別 */
       category: {
