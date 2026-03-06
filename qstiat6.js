@@ -114,7 +114,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 				return ctx.logs;
 			},
 			serialize: function (name, logs) {
-				var headers = ['block', 'trial', 'cond', 'type', 'cat', 'stim', 'resp', 'err', 'rt', 'd', 'fb', 'bOrd'];
+				var headers = ['block', 'trial', 'cond', 'type', 'cat', 'stim', 'resp', 'err', 'rt', 'd', 'bOrd'];
 				var myLogs = [];
 				var iLog;
 
@@ -151,18 +151,17 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 				});
 
 				content.push([
-					9,
-					999,
-					'end',
-					'',
-					'',
-					'',
-					'',
-					'',
-					'',
-					piCurrent.d,
-					piCurrent.feedback,
-					block2Condition
+				  9,
+				  999,
+				  'end',
+				  '',
+				  '',
+				  '',
+				  '',
+				  '',
+				  '',
+				  piCurrent.d,
+				  block2Condition
 				]);
 
 				content.unshift(headers);
@@ -200,7 +199,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 		var category = piCurrent.category.name;
 		var nonCategory = piCurrent.nonCategory && piCurrent.nonCategory.name;
 
-		var block2Condition;
+		var block2Condition = 'positive_first';
 
 		var catVsNonCatLayout = [
 			{location:{left:6,top:1}, media:{word:piCurrent.leftKeyText},  css:piCurrent.keysCss},
@@ -490,9 +489,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 				currentCondition = 'NEG';
 			}
 
-			if (iBlock === 2){
-				block2Condition = currentCondition;
-			}
+
 
 			var instHTML = piCurrent.trialsByBlock[iBlock-1].instHTML;
 			if (instHTML === '') {
@@ -641,7 +638,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 		API.addSettings('hooks',{
 			endTask: function(){
 				var DScoreObj = scorer.computeD();
-				piCurrent.feedback = DScoreObj.FBMsg;
+				piCurrent.feedback = '';
 				piCurrent.d = DScoreObj.DScore;
 				window.minnoJS.onEnd();
 			}
