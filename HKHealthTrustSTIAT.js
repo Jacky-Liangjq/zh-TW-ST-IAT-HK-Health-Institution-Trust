@@ -1,7 +1,7 @@
 define(
   [
     'pipAPI',
-    'https://cdn.jsdelivr.net/gh/Jacky-Liangjq/zh-TW-ST-IAT-HK-Health-Institution-Trust@main/qstiat6.js'
+    'https://cdn.jsdelivr.net/gh/Jacky-Liangjq/zh-TW-ST-IAT-HK-Health-Institution-Trust@6f49de03b82a70983d3c625300dcdbe664275d45/qstiat6-mobile.js'
   ],
   function (APIConstructor, stiatExtension) {
 
@@ -11,20 +11,55 @@ define(
        目標類別：Health Institutions（香港／繁體；全部中文）
        ===================================================== */
     var healthInstitutionsAllCN = [
-      { word: '醫院管理局' },
       { word: '醫管局' },
-      { word: '衞生署' },
       { word: '衛生署' },
-      { word: '衞生防護中心' },
       { word: '衛生防護中心' },
       { word: '政府醫院' },
       { word: '公立醫院' },
       { word: '公共醫療體系' },
       { word: '基層醫療系統' },
       { word: '社區健康中心' },
+      { word: '胸肺科診所' },
+      { word: '兒童體能智力測驗中心' },
+      { word: '醫學遺傳服務中心' },
+      { word: '牙科街症服務診所' },
+      { word: '長者健康中心' },
+      { word: '綜合治療中心' },
+      { word: '母嬰健康院' },
+      { word: '美沙酮診所' },
+      { word: '學童牙科診所' },
+      { word: '社會衛生科診所' },
+      { word: '學生健康服務中心' },
+      { word: '學生健康評估中心' },
+      { word: '旅遊健康中心' },
+      { word: '婦女健康中心' },
+      { word: '公營醫院' },
+      { word: '普通科診所' },
+      { word: '專科診所' },
+      { word: '中醫診所' },
       { word: '公共醫療機構' }
     ];
 
+        /* =====================================================
+       對照類別：生活服務機構
+       ===================================================== */
+    var nonHealthInstitutionsCN = [
+      { word: '超市' },
+      { word: '銀行' },
+      { word: '地鐵站' },
+      { word: '餐廳' },
+      { word: '郵局' },
+      { word: '書店' },
+      { word: '電影院' },
+      { word: '健身中心' },
+      { word: '旅行社' },
+      { word: '保險公司' },
+      { word: '百貨公司' },
+      { word: '商場' },
+      { word: '學校' }
+    ];
+
+    
     /* =====================================================
        屬性詞（可信 / 不可信；斜杠前後全部用）
        ===================================================== */
@@ -69,14 +104,15 @@ define(
        中文操作指示（不含顏色、不含鍵位提示）
        ===================================================== */
     var instHTML = `
-      <div style="font-size:20px; line-height:1.75;">
+      <div style="font-size:10px; line-height:1.75;">
         <p><b>請在保持準確的情況下，盡量快速地將詞語歸類。</b></p>
 
         <p>詞語會逐一出現，請根據畫面上方的分類提示作答。</p>
 
         <p>如按錯，畫面會顯示紅色「X」，請改按正確的鍵後繼續。</p>
 
-        <p>準備好後，請按空白鍵開始。</p>
+        <p>準備好後，請點擊屏幕色塊開始。</p>
+
       </div>
     `;
 
@@ -85,18 +121,26 @@ define(
        ===================================================== */
     var uniformCss = {
       color: '#000000',
-      'font-size': '2em'
+      'font-size': '3em'
     };
 
     return stiatExtension({
 
       /* block 說明頁（全中文） */
       trialsByBlock: [
-        { instHTML: instHTML, block: 1, miniBlocks: 2, singleAttTrials: 15, sharedAttTrials: 15, categoryTrials: 0 },
-        { instHTML: instHTML, block: 2, miniBlocks: 2, singleAttTrials: 10, sharedAttTrials: 10,  categoryTrials: 5 },
-        { instHTML: instHTML, block: 3, miniBlocks: 2, singleAttTrials: 10,  sharedAttTrials: 10, categoryTrials: 5 },
-        { instHTML: instHTML, block: 4, miniBlocks: 2, singleAttTrials: 10, sharedAttTrials: 10,  categoryTrials: 5 },
-        { instHTML: instHTML, block: 5, miniBlocks: 2, singleAttTrials: 10,  sharedAttTrials: 10, categoryTrials: 5 }
+      
+        // Block1
+        { instHTML: instHTML, block:1, miniBlocks:4, singleAttTrials:7, sharedAttTrials:5, categoryTrials:0 },
+      
+        // Block2
+        { instHTML: instHTML, block:2, miniBlocks:4, singleAttTrials:6, sharedAttTrials:6, categoryTrials:0 },
+      
+        // Block3
+        { instHTML: instHTML, block:3, miniBlocks:3, singleAttTrials:3, sharedAttTrials:3, categoryTrials:3 },
+      
+        // Block4
+        { instHTML: instHTML, block:4, miniBlocks:3, singleAttTrials:3, sharedAttTrials:3, categoryTrials:3 }
+      
       ],
 
       /* 目標類別 */
@@ -108,6 +152,18 @@ define(
           height: 7
         },
         media: healthInstitutionsAllCN,
+        css: uniformCss
+      },
+
+            /* 對照類別 */
+      nonCategory: {
+        name: '生活服務機構',
+        title: {
+          media: { word: '生活服務機構' },
+          css: uniformCss,
+          height: 7
+        },
+        media: nonHealthInstitutionsCN,
         css: uniformCss
       },
 
