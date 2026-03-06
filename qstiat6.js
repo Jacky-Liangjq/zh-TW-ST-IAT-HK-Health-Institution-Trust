@@ -145,7 +145,6 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 						log.data.score,
 						log.latency,
 						'',
-						'',
 						''
 					];
 				});
@@ -657,6 +656,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 		
 				trialSequence.push(mixer);
 			}
+		}
 		}
 
 		trialSequence.push({
