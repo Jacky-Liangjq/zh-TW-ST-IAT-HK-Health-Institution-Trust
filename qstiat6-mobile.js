@@ -697,7 +697,42 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			}
 			return (instHTML);
 		}
+
+		function shuffleArray(arr) {
+			var a = arr.slice();
+			for (var i = a.length - 1; i > 0; i--) {
+				var j = Math.floor(Math.random() * (i + 1));
+				var tmp = a[i];
+				a[i] = a[j];
+				a[j] = tmp;
+			}
+			return a;
+		}
 		
+		function buildNonRepeatingTrials(setName, trialName, nNeeded, blockNum, currentCondition, blockLayout) {
+			var source = piCurrent[setName].media || [];
+			var allTrials = [];
+			var pool = [];
+			var i;
+		
+			while (allTrials.length < nNeeded) {
+				if (pool.length === 0) {
+					pool = shuffleArray(source);
+				}
+				for (i = 0; i < pool.length && allTrials.length < nNeeded; i++) {
+					allTrials.push({
+						inherit: trialName,
+						data: {condition: currentCondition, block: blockNum},
+						layout: blockLayout.concat(reminderStimulus),
+						media: {word: pool[i].word}
+					});
+				}
+				pool = [];
+			}
+		
+			return allTrials;
+		}
+
 		//This is the tricky part. We will create the trial sequence with js code, for flexibility.
 		var trialSequence = [];
 		
@@ -815,71 +850,115 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			var isBlock1 = (iBlock === 1);
 			
 			for (var iMini = 1; iMini <= piCurrent.trialsByBlock[iBlock-1].miniBlocks; iMini++)
-			{//For each mini block
-			  var isBlock1 = (iBlock === 1);
-			    var mixer =
-			    {//This mixer will randomize the trials of all the three groups.
-			        mixer : 'random',
-			        data :
-			        [
-			            {//The single attribute trials
-			                mixer : 'repeat',
-			                times : piCurrent.trialsByBlock[iBlock-1].singleAttTrials,
-			                data :
-			                [{
-							inherit : (iBlock===1 ? 'leftCat_only' :
-							          iBlock===2 ? 'leftAtt1_only' :
-							          iBlock===3 ? 'leftAtt1_only' :
-							          iBlock===4 ? 'leftAtt1_only' : 'leftAtt1_only'),		
-			                    data : {condition : currentCondition, block : iBlock},
-			                    layout : blockLayout.concat(reminderStimulus)
-			                }]
-			            },
-			            {//The key-shared attribute trials
-			                mixer : 'repeat',
-			                times : piCurrent.trialsByBlock[iBlock-1].sharedAttTrials,
-			                data :
-			                [{
-							inherit : (iBlock===1 ? 'rightNonCat_only' :
-							          iBlock===2 ? 'rightAtt2_only' :
-							          iBlock===3 ? 'rightAtt2_only' :
-							          iBlock===4 ? 'rightAtt2_only' : 'rightAtt2_only'),
-			                    data : {condition : currentCondition, block : iBlock},
-			                    layout : blockLayout.concat(reminderStimulus)
-			                }]
-			            }
-			        ]
-			    };
+			{
+				var nLeft  = piCurrent.trialsByBlock[iBlock-1].singleAttTrials;
+				var nRight = piCurrent.trialsByBlock[iBlock-1].sharedAttTrials;
+				var nCat   = piCurrent.trialsByBlock[iBlock-1].categoryTrials;
 			
-				// Block 1/2 不需要第三組
-				if (iBlock===3){
-				  // Block3：category 一律在左（與 attribute1 同側）
-				  mixer.data.push({
-				    mixer : 'repeat',
-				    times : piCurrent.trialsByBlock[iBlock-1].categoryTrials,
-				    data : [{
-				      inherit : 'leftCat',
-				      data : {condition : currentCondition, block : iBlock},
-				      layout : blockLayout.concat(reminderStimulus)
-				    }]
-				  });
-				}
-				else if (iBlock===4){
-				  // Block4：category 一律在右（與 attribute2 同側）
-				  mixer.data.push({
-				    mixer : 'repeat',
-				    times : piCurrent.trialsByBlock[iBlock-1].categoryTrials,
-				    data : [{
-				      inherit : 'rightCat',
-				      data : {condition : currentCondition, block : iBlock},
-				      layout : blockLayout.concat(reminderStimulus)
-				    }]
-				  });
+				// Block 1：健康機構 vs 生活服務機構
+				if (iBlock === 1) {
+					var leftTrials_block1 = buildNonRepeatingTrials(
+						'category',
+						'leftCat_only',
+						nLeft,
+						iBlock,
+						currentCondition,
+						blockLayout
+					);
+			
+					var rightTrials_block1 = buildNonRepeatingTrials(
+						'nonCategory',
+						'rightNonCat_only',
+						nRight,
+						iBlock,
+						currentCondition,
+						blockLayout
+					);
+			
+					trialSequence.push({
+						mixer: 'random',
+						data: leftTrials_block1.concat(rightTrials_block1)
+					});
 				}
 			
-			    trialSequence.push(mixer);
+				// Block 2：可信 vs 不可信
+				else if (iBlock === 2) {
+					var leftTrials_block2 = buildNonRepeatingTrials(
+						'attribute1',
+						'leftAtt1_only',
+						nLeft,
+						iBlock,
+						currentCondition,
+						blockLayout
+					);
+			
+					var rightTrials_block2 = buildNonRepeatingTrials(
+						'attribute2',
+						'rightAtt2_only',
+						nRight,
+						iBlock,
+						currentCondition,
+						blockLayout
+					);
+			
+					trialSequence.push({
+						mixer: 'random',
+						data: leftTrials_block2.concat(rightTrials_block2)
+					});
+				}
+			
+				// Block 3 / 4 维持原本逻辑
+				else {
+					var mixer = {
+						mixer : 'random',
+						data : [
+							{
+								mixer : 'repeat',
+								times : nLeft,
+								data : [{
+									inherit : 'leftAtt1_only',
+									data : {condition : currentCondition, block : iBlock},
+									layout : blockLayout.concat(reminderStimulus)
+								}]
+							},
+							{
+								mixer : 'repeat',
+								times : nRight,
+								data : [{
+									inherit : 'rightAtt2_only',
+									data : {condition : currentCondition, block : iBlock},
+									layout : blockLayout.concat(reminderStimulus)
+								}]
+							}
+						]
+					};
+			
+					if (iBlock === 3){
+						mixer.data.push({
+							mixer : 'repeat',
+							times : nCat,
+							data : [{
+								inherit : 'leftCat',
+								data : {condition : currentCondition, block : iBlock},
+								layout : blockLayout.concat(reminderStimulus)
+							}]
+						});
+					}
+					else if (iBlock === 4){
+						mixer.data.push({
+							mixer : 'repeat',
+							times : nCat,
+							data : [{
+								inherit : 'rightCat',
+								data : {condition : currentCondition, block : iBlock},
+								layout : blockLayout.concat(reminderStimulus)
+							}]
+						});
+					}
+			
+					trialSequence.push(mixer);
+				}
 			}
-		}
 		//Add the final goodbye trial.
 		//Add the final goodbye trial.
 		trialSequence.push({
