@@ -62,13 +62,19 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 				media : [],
 				css : {color:'#31b404','font-size':'2em'}
 			},
-
+			
 			trialsByBlock : [
-				{ instHTML:'', block:1, miniBlocks:1, singleAttTrials:10, sharedAttTrials:10, categoryTrials:0 },
-				{ instHTML:'', block:2, miniBlocks:2, singleAttTrials:10, sharedAttTrials:7, categoryTrials:7 },
-				{ instHTML:'', block:3, miniBlocks:2, singleAttTrials:10, sharedAttTrials:7, categoryTrials:7 },
-				{ instHTML:'', block:4, miniBlocks:2, singleAttTrials:10, sharedAttTrials:7, categoryTrials:7 },
-				{ instHTML:'', block:5, miniBlocks:2, singleAttTrials:10, sharedAttTrials:7, categoryTrials:7 }
+			  // Block1: 健康機構(左) vs 生活服務機構(右) —— 13 vs 12
+			  { instHTML:'', block:1, miniBlocks:1, singleAttTrials:13, sharedAttTrials:12, categoryTrials:0 },
+			
+			  // Block2: 可信(左) vs 不可信(右) —— 13 vs 12
+			  { instHTML:'', block:2, miniBlocks:1, singleAttTrials:13, sharedAttTrials:12, categoryTrials:0 },
+			
+			  // Block3: 正面聯想 —— 9可信 9不可信 7機構
+			  { instHTML:'', block:3, miniBlocks:1, singleAttTrials:9,  sharedAttTrials:9,  categoryTrials:7 },
+			
+			  // Block4: 負面聯想 —— 9可信 9不可信 7機構
+			  { instHTML:'', block:4, miniBlocks:1, singleAttTrials:9,  sharedAttTrials:9,  categoryTrials:7 }
 			],
 
 			blockOrder : 'random',
@@ -718,30 +724,24 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 		var currentCondition = '';
 		var blockLayout;
 		
-		// 固定：attribute1 永远左，attribute2 永远右（你要的）
-		var attLeft  = 'leftAtt1';
-		var attRight = 'rightAtt2';
+
 		
-		// Block 1: category vs nonCategory（健康機構 vs 生活服務機構）
-		if (iBlock === 1){
-		  blockLayout = catVsNonCatLayout;
-		  currentCondition = category + ',' + nonCategory; // 只是記錄用
-		}
-		// Block 2: attribute only（可信 vs 不可信）
-		else if (iBlock === 2){
-		  blockLayout = attOnlyLayout;
-		  currentCondition = attribute1 + ',' + attribute2;
-		}
-		// Block 3: 正面聯想（category + att1）vs（att2）
-		else if (iBlock === 3){
-		  blockLayout = comboLayout_pos_catLeft;
-		  currentCondition = category + '/' + attribute1 + ',' + attribute2;
-		}
-		// Block 4: 負面聯想（att1）vs（category + att2）
-		else if (iBlock === 4){
-		  blockLayout = comboLayout_neg_catRight;
-		  currentCondition = attribute1 + ',' + category + '/' + attribute2;
-		}
+			if (iBlock === 1){
+			  blockLayout = catVsNonCatLayout;
+			  currentCondition = 'CAT_ONLY';
+			}
+			else if (iBlock === 2){
+			  blockLayout = attOnlyLayout;
+			  currentCondition = 'ATT_ONLY';
+			}
+			else if (iBlock === 3){
+			  blockLayout = comboLayout_pos_catLeft;
+			  currentCondition = 'POS';
+			}
+			else if (iBlock === 4){
+			  blockLayout = comboLayout_neg_catRight;
+			  currentCondition = 'NEG';
+			}
 
 
 			if (iBlock === 2)
@@ -751,15 +751,43 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 
 		
 			//Set the instructions html.
-			var instHTML = piCurrent.trialsByBlock[iBlock-1].instHTML; 
-			//Users can set the instHTML of each block, or use the instructions templates.
-			if (instHTML === '') 
-			{//Did not use the instHTML of each block, so let's use the instructions templates.
-				instHTML = getInstHTML({
-					blockNum : iBlock, 
-					nBlocks : piCurrent.trialsByBlock.length, 
-					isPractice : isPrac, categorySide : catSide
-				});
+			var instHTML = piCurrent.trialsByBlock[iBlock-1].instHTML;
+			
+			// Users can set the instHTML of each block, or use simple defaults here.
+			if (instHTML === '')
+			{
+			    if (iBlock === 1){
+			        instHTML =
+			            '<div style="font-size:20px;line-height:1.6">' +
+			            '<p style="text-align:center"><u>第 ' + iBlock + ' 部分（共 ' + piCurrent.trialsByBlock.length + ' 部分）</u></p>' +
+			            '<p>當畫面出現屬於 <b>' + category + '</b> 的詞語，請按或點按左側。<br/>' +
+			            '當畫面出現屬於 <b>' + nonCategory + '</b> 的詞語，請按或點按右側。<br/><br/>' +
+			            '請盡量快速而準確地作答。</p></div>';
+			    }
+			    else if (iBlock === 2){
+			        instHTML =
+			            '<div style="font-size:20px;line-height:1.6">' +
+			            '<p style="text-align:center"><u>第 ' + iBlock + ' 部分（共 ' + piCurrent.trialsByBlock.length + ' 部分）</u></p>' +
+			            '<p>當畫面出現屬於 <b>' + attribute1 + '</b> 的詞語，請按或點按左側。<br/>' +
+			            '當畫面出現屬於 <b>' + attribute2 + '</b> 的詞語，請按或點按右側。<br/><br/>' +
+			            '請盡量快速而準確地作答。</p></div>';
+			    }
+			    else if (iBlock === 3){
+			        instHTML =
+			            '<div style="font-size:20px;line-height:1.6">' +
+			            '<p style="text-align:center"><u>第 ' + iBlock + ' 部分（共 ' + piCurrent.trialsByBlock.length + ' 部分）</u></p>' +
+			            '<p>屬於 <b>' + attribute1 + '</b> 或 <b>' + category + '</b> 的詞語，請按或點按左側。<br/>' +
+			            '屬於 <b>' + attribute2 + '</b> 的詞語，請按或點按右側。<br/><br/>' +
+			            '請盡量快速而準確地作答。</p></div>';
+			    }
+			    else if (iBlock === 4){
+			        instHTML =
+			            '<div style="font-size:20px;line-height:1.6">' +
+			            '<p style="text-align:center"><u>第 ' + iBlock + ' 部分（共 ' + piCurrent.trialsByBlock.length + ' 部分）</u></p>' +
+			            '<p>屬於 <b>' + attribute1 + '</b> 的詞語，請按或點按左側。<br/>' +
+			            '屬於 <b>' + attribute2 + '</b> 或 <b>' + category + '</b> 的詞語，請按或點按右側。<br/><br/>' +
+			            '請盡量快速而準確地作答。</p></div>';
+			    }
 			}
 			//Add the block's instructions sequence
 			trialSequence.push(
@@ -794,6 +822,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			
 			for (var iMini = 1; iMini <= piCurrent.trialsByBlock[iBlock-1].miniBlocks; iMini++)
 			{//For each mini block
+			  var isBlock1 = (iBlock === 1);
 			    var mixer =
 			    {//This mixer will randomize the trials of all the three groups.
 			        mixer : 'random',
@@ -804,10 +833,10 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			                times : piCurrent.trialsByBlock[iBlock-1].singleAttTrials,
 			                data :
 			                [{
-			                    inherit : (iBlock===1 ? 'leftCat' :
-						          iBlock===2 ? attLeft :
-						          iBlock===3 ? attLeft :
-						          iBlock===4 ? 'leftNonCat' : attLeft),
+							inherit : (iBlock===1 ? 'leftCat_only' :
+							          iBlock===2 ? 'leftAtt1_only' :
+							          iBlock===3 ? 'leftAtt1_only' :
+							          iBlock===4 ? 'leftAtt1_only' : 'leftAtt1_only'),		
 			                    data : {condition : currentCondition, block : iBlock},
 			                    layout : blockLayout.concat(reminderStimulus)
 			                }]
@@ -817,10 +846,10 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			                times : piCurrent.trialsByBlock[iBlock-1].sharedAttTrials,
 			                data :
 			                [{
-			                    inherit : (iBlock===1 ? 'rightNonCat' :
-						          iBlock===2 ? attRight :
-						          iBlock===3 ? attRight :
-						          iBlock===4 ? 'rightCat' : attRight),
+							inherit : (iBlock===1 ? 'rightNonCat_only' :
+							          iBlock===2 ? 'rightAtt2_only' :
+							          iBlock===3 ? 'rightAtt2_only' :
+							          iBlock===4 ? 'rightAtt2_only' : 'rightAtt2_only'),
 			                    data : {condition : currentCondition, block : iBlock},
 			                    layout : blockLayout.concat(reminderStimulus)
 			                }]
@@ -891,18 +920,20 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 		
 		//Settings for the score computation.
 		scorer.addSettings('compute',{
-			ErrorVar:'score',
-			condVar:'condition',
-			cond1VarValues: [ category + '/' + attribute1 + ',' + attribute2 ],      // Block3
-			cond2VarValues: [ attribute1 + ',' + category + '/' + attribute2 ],      // Block4
-			parcelVar : "parcel", //We use only one parcel because it is probably not less reliable.
-			parcelValue : ['first'],
-			fastRT : 150, //Below this reaction time, the latency is considered extremely fast.
-			maxFastTrialsRate : 0.1, //Above this % of extremely fast responses within a condition, the participant is considered too fast.
-			minRT : 400, //Below this latency
-			maxRT : 10000, //above this
-			errorLatency : {use:"latency", penalty:600, useForSTD:true},
-			postSettings : {score:"score",msg:"feedback",url:"/implicit/scorer"}
+		    ErrorVar:'score',
+		    condVar:'condition',
+		    //condition 1
+		    cond1VarValues: ['POS'],
+		    //condition 2
+		    cond2VarValues: ['NEG'],
+		    parcelVar : "parcel",
+		    parcelValue : ['first'],
+		    fastRT : 150,
+		    maxFastTrialsRate : 0.1,
+		    minRT : 400,
+		    maxRT : 10000,
+		    errorLatency : {use:"latency", penalty:600, useForSTD:true},
+		    postSettings : {score:"score",msg:"feedback",url:"/implicit/scorer"}
 		});
 
 		//Helper function to set the feedback messages.
