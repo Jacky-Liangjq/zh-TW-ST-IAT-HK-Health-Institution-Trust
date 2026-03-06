@@ -133,7 +133,7 @@ define(
         { instHTML: instHTML, block:1, miniBlocks:4, singleAttTrials:7, sharedAttTrials:5, categoryTrials:0 },
       
         // Block2
-        { instHTML: instHTML, block:2, miniBlocks:4, singleAttTrials:6, sharedAttTrials:6, categoryTrials:0 },
+        { instHTML: instHTML, block:2, miniBlocks:4, singleAttTrials:8, sharedAttTrials:7, categoryTrials:0 },
       
         // Block3
         { instHTML: instHTML, block:3, miniBlocks:3, singleAttTrials:3, sharedAttTrials:3, categoryTrials:3 },
