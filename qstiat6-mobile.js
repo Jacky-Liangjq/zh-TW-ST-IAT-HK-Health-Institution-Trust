@@ -232,7 +232,6 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
                         log.data.score, //'err'
                         log.latency, //'rt'
                         '', //'d'
-                        '', //'fb'
                         '' //'bOrd'
                         ]; });
                 //console.log('mapped');
@@ -959,6 +958,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 					trialSequence.push(mixer);
 				}
 			}
+		}
 		//Add the final goodbye trial.
 		//Add the final goodbye trial.
 		trialSequence.push({
