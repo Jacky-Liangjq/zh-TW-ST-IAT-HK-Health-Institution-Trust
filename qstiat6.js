@@ -465,6 +465,42 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			}
 		}
 
+		function shuffleArray(arr) {
+			var a = arr.slice();
+			for (var i = a.length - 1; i > 0; i--) {
+				var j = Math.floor(Math.random() * (i + 1));
+				var tmp = a[i];
+				a[i] = a[j];
+				a[j] = tmp;
+			}
+			return a;
+		}
+		
+		function buildNonRepeatingTrials(setName, trialName, nNeeded, blockNum, currentCondition, blockLayout) {
+			var source = piCurrent[setName].media || [];
+			var allTrials = [];
+			var pool = [];
+			var i;
+		
+			while (allTrials.length < nNeeded) {
+				if (pool.length === 0) {
+					pool = shuffleArray(source);
+				}
+				for (i = 0; i < pool.length && allTrials.length < nNeeded; i++) {
+					allTrials.push({
+						inherit: trialName,
+						data: {condition: currentCondition, block: blockNum},
+						layout: blockLayout.concat(reminderStimulus),
+						media: {word: pool[i].word}
+					});
+				}
+				pool = [];
+			}
+		
+			return allTrials;
+		}
+		
+		
 		var trialSequence = [];
 
 		for (var iBlock = 1; iBlock <= piCurrent.trialsByBlock.length; iBlock++)
@@ -512,47 +548,94 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 					}
 				]
 			});
-
-			for (var iMini = 1; iMini <= piCurrent.trialsByBlock[iBlock-1].miniBlocks; iMini++)
-			{
+		for (var iMini = 1; iMini <= piCurrent.trialsByBlock[iBlock-1].miniBlocks; iMini++)
+		{
+			var nLeft  = piCurrent.trialsByBlock[iBlock-1].singleAttTrials;
+			var nRight = piCurrent.trialsByBlock[iBlock-1].sharedAttTrials;
+			var nCat   = piCurrent.trialsByBlock[iBlock-1].categoryTrials;
+		
+			// Block 1：健康機構 vs 生活服務機構
+			if (iBlock === 1) {
+				var leftTrials_block1 = buildNonRepeatingTrials(
+					'category',
+					'leftCat_only',
+					nLeft,
+					iBlock,
+					currentCondition,
+					blockLayout
+				);
+		
+				var rightTrials_block1 = buildNonRepeatingTrials(
+					'nonCategory',
+					'rightNonCat_only',
+					nRight,
+					iBlock,
+					currentCondition,
+					blockLayout
+				);
+		
+				trialSequence.push({
+					mixer: 'random',
+					data: leftTrials_block1.concat(rightTrials_block1)
+				});
+			}
+		
+			// Block 2：可信 vs 不可信
+			else if (iBlock === 2) {
+				var leftTrials_block2 = buildNonRepeatingTrials(
+					'attribute1',
+					'leftAtt1_only',
+					nLeft,
+					iBlock,
+					currentCondition,
+					blockLayout
+				);
+		
+				var rightTrials_block2 = buildNonRepeatingTrials(
+					'attribute2',
+					'rightAtt2_only',
+					nRight,
+					iBlock,
+					currentCondition,
+					blockLayout
+				);
+		
+				trialSequence.push({
+					mixer: 'random',
+					data: leftTrials_block2.concat(rightTrials_block2)
+				});
+			}
+		
+			// Block 3 / 4 维持原本逻辑
+			else {
 				var mixer = {
 					mixer : 'random',
 					data : [
 						{
 							mixer : 'repeat',
-							times : piCurrent.trialsByBlock[iBlock-1].singleAttTrials,
+							times : nLeft,
 							data : [{
-								inherit : (
-									iBlock===1 ? 'leftCat_only' :
-									iBlock===2 ? 'leftAtt1_only' :
-									iBlock===3 ? 'leftAtt1_only' :
-									iBlock===4 ? 'leftAtt1_only' : 'leftAtt1_only'
-								),
+								inherit : 'leftAtt1_only',
 								data : {condition : currentCondition, block : iBlock},
 								layout : blockLayout.concat(reminderStimulus)
 							}]
 						},
 						{
 							mixer : 'repeat',
-							times : piCurrent.trialsByBlock[iBlock-1].sharedAttTrials,
+							times : nRight,
 							data : [{
-								inherit : (
-									iBlock===1 ? 'rightNonCat_only' :
-									iBlock===2 ? 'rightAtt2_only' :
-									iBlock===3 ? 'rightAtt2_only' :
-									iBlock===4 ? 'rightAtt2_only' : 'rightAtt2_only'
-								),
+								inherit : 'rightAtt2_only',
 								data : {condition : currentCondition, block : iBlock},
 								layout : blockLayout.concat(reminderStimulus)
 							}]
 						}
 					]
 				};
-
+		
 				if (iBlock === 3){
 					mixer.data.push({
 						mixer : 'repeat',
-						times : piCurrent.trialsByBlock[iBlock-1].categoryTrials,
+						times : nCat,
 						data : [{
 							inherit : 'leftCat',
 							data : {condition : currentCondition, block : iBlock},
@@ -563,7 +646,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 				else if (iBlock === 4){
 					mixer.data.push({
 						mixer : 'repeat',
-						times : piCurrent.trialsByBlock[iBlock-1].categoryTrials,
+						times : nCat,
 						data : [{
 							inherit : 'rightCat',
 							data : {condition : currentCondition, block : iBlock},
@@ -571,7 +654,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 						}]
 					});
 				}
-
+		
 				trialSequence.push(mixer);
 			}
 		}
