@@ -40,7 +40,7 @@ define(
       { word: '公共醫療機構' }
     ];
 
-        /* =====================================================
+    /* =====================================================
        對照類別：生活服務機構
        ===================================================== */
     var nonHealthInstitutionsCN = [
@@ -59,11 +59,9 @@ define(
       { word: '學校' }
     ];
 
-    
     /* =====================================================
-       屬性詞（可信 / 不可信；斜杠前後全部用）
+       屬性詞（可信 / 不可信）
        ===================================================== */
-
     var trustworthyWords = [
       { word: '能力出眾' }, { word: '能幹的' },
       { word: '卓有成效' }, { word: '有效果的' },
@@ -101,23 +99,24 @@ define(
     ];
 
     /* =====================================================
-       中文操作指示（不含顏色、不含鍵位提示）
+       桌面版說明文字
        ===================================================== */
     var instHTML = `
-      <div style="font-size:10px; line-height:1.75;">
+      <div style="font-size:16px; line-height:1.75;">
         <p><b>請在保持準確的情況下，盡量快速地將詞語歸類。</b></p>
 
         <p>詞語會逐一出現，請根據畫面上方的分類提示作答。</p>
 
+        <p>請使用鍵盤作答：左側分類按 <b>E</b> 鍵，右側分類按 <b>I</b> 鍵。</p>
+
         <p>如按錯，畫面會顯示紅色「X」，請改按正確的鍵後繼續。</p>
 
-        <p>準備好後，請點擊屏幕色塊開始。</p>
-
+        <p>準備好後，請按 <b>空格鍵</b> 開始。</p>
       </div>
     `;
 
     /* =====================================================
-       統一視覺設定（無顏色、同字號）
+       統一視覺設定
        ===================================================== */
     var uniformCss = {
       color: '#000000',
@@ -126,24 +125,20 @@ define(
 
     return stiatExtension({
 
-      /* block 說明頁（全中文） */
       trialsByBlock: [
-      
-        // Block1
+        // Block1: 健康機構 vs 生活服務機構
         { instHTML: instHTML, block:1, miniBlocks:4, singleAttTrials:7, sharedAttTrials:5, categoryTrials:0 },
-      
-        // Block2
+
+        // Block2: 可信 vs 不可信
         { instHTML: instHTML, block:2, miniBlocks:4, singleAttTrials:6, sharedAttTrials:6, categoryTrials:0 },
-      
-        // Block3
+
+        // Block3: 正面聯想
         { instHTML: instHTML, block:3, miniBlocks:3, singleAttTrials:3, sharedAttTrials:3, categoryTrials:3 },
-      
-        // Block4
+
+        // Block4: 負面聯想
         { instHTML: instHTML, block:4, miniBlocks:3, singleAttTrials:3, sharedAttTrials:3, categoryTrials:3 }
-      
       ],
 
-      /* 目標類別 */
       category: {
         name: '健康機構',
         title: {
@@ -155,7 +150,6 @@ define(
         css: uniformCss
       },
 
-            /* 對照類別 */
       nonCategory: {
         name: '生活服務機構',
         title: {
@@ -167,7 +161,6 @@ define(
         css: uniformCss
       },
 
-      /* 屬性：可信 */
       attribute1: {
         name: '可信',
         title: {
@@ -179,7 +172,6 @@ define(
         css: uniformCss
       },
 
-      /* 屬性：不可信 */
       attribute2: {
         name: '不可信',
         title: {
