@@ -197,7 +197,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
             // Transform logs into a string
             // we save as CSV because qualtrics limits to 20K characters and this is more efficient.
             serialize: function (name, logs) {
-                var headers = ['block', 'trial', 'cond', 'type', 'cat',  'stim', 'resp', 'err', 'rt', 'd', 'fb', 'bOrd'];
+                var headers = ['block', 'trial', 'cond', 'type', 'cat', 'stim', 'resp', 'err', 'rt', 'd', 'bOrd'];
                 //console.log(logs);
                 var myLogs = [];
                 var iLog;
@@ -237,21 +237,19 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
                         ]; });
                 //console.log('mapped');
                 //Add a line with the feedback, score and block-order condition
-                content.push([
-                            9, //'block'
-                            999, //'trial'
-                            'end', //'cond'
-                            //'', //'comp'
-                            '', //'type'
-                            '', //'cat'
-                            '', //'stim'
-                            '', //'resp'
-                            '', //'err'
-                            '', //'rt'
-                            piCurrent.d, //'d'
-                            piCurrent.feedback, //'fb'
-                            block2Condition //'bOrd'
-                        ]);
+				content.push([
+				  9,
+				  999,
+				  'end',
+				  '',
+				  '',
+				  '',
+				  '',
+				  '',
+				  '',
+				  piCurrent.d,
+				  block2Condition
+				]);
                 //console.log(content);
                         
                 content.unshift(headers);
@@ -296,7 +294,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 		var nonCategory = piCurrent.nonCategory && piCurrent.nonCategory.name;
 
 		//This is our block-order condition. We will save it in the explicit table.
-		var block2Condition;
+		var block2Condition = 'positive_first';
 		
 		// layout object for the trials where category on left
 		var leftLayout = [
@@ -744,10 +742,6 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 			}
 
 
-			if (iBlock === 2)
-			{//Set the block2Condition variable. That is our block order condition.
-				block2Condition = currentCondition;
-			}
 
 		
 			//Set the instructions html.
@@ -976,7 +970,7 @@ define(['pipAPI','pipScorer','underscore'], function(APIConstructor, Scorer, _) 
 				//Compute score
 				var DScoreObj = scorer.computeD();
 				//Save for the task's session.
-				piCurrent.feedback = DScoreObj.FBMsg;
+				piCurrent.feedback = '';
 				piCurrent.d = DScoreObj.DScore;
 				//Save to server
 				//API.save({block2Condition:block2Condition, feedback:DScoreObj.FBMsg, d: DScoreObj.DScore});
